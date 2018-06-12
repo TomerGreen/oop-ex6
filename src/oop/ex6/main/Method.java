@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class MethodDec {
+public class Method {
 
     String name;
 
