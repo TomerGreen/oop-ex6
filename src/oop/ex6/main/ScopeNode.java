@@ -5,13 +5,10 @@ class ScopeNode {
     ArrayList<ScopeNode> sons;
 
     String data;
-    ScopeNode parrent;
 
 
-    public ScopeNode(String dataLine, ScopeNode parrent)
-    {
+    public ScopeNode(String dataLine){
         data = dataLine;
-        this.parrent = parrent;
     }
 
     public void addSon(ScopeNode newSon){
@@ -21,7 +18,5 @@ class ScopeNode {
     public String getData(){
         return data;
     }
-
-    //todo think about parent attribute
 
 }
