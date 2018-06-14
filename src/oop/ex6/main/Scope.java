@@ -1,5 +1,3 @@
-package oop.ex6.main;
-
 import java.util.HashMap;
 
 public abstract class Scope {
@@ -11,5 +9,5 @@ public abstract class Scope {
     Scope parent;
 
     /** The global statement this statement is a part of. */
-    GlobalStatement global;
+//    GlobalStatement global;
 }
