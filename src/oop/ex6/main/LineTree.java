@@ -7,9 +7,10 @@ public class LineTree {
     private final static String ROOT_LINE = "class;";
     private final static String SINGLE_LINE_SUFFIX = ";";
     private final static String SPACES = "\\s";
-    private final static int EMPTY = 0;
     private final static String METHOD_DEC = "void";
+    private final static String BEG_OF_SCOPE = "{";
     private final static String END_OF_SCOPE = "}";
+    private final static int EMPTY = 0;
 
     ScopeNode root;
 
@@ -27,22 +28,18 @@ public class LineTree {
         while (line != null){
             String[] tokens = line.split(SPACES);
             if(!commentOrEmptyCase(line, tokens)){
-                if(singleLineCase(tokens)) {
+                if(singleLineCase(tokens))
                     currRoot.addSon(new ScopeNode(line, currRoot));
-                }
-                else if(tokens[0].equals(METHOD_DEC)){
+                else if(begOfNewScope(tokens))
                     currRoot.addSon(parser(br, new ScopeNode(line, currRoot)));
-                }
-                else if(endOfScopeCase(tokens) && currRoot.parrent != null){
+                else if(endOfScopeCase(tokens) && currRoot.parrent != null)
                     currRoot = currRoot.parrent;
-                }
-                else{
+                else
                     throw new ExceptionFileFormat();
-                }
             }
             line = br.readLine();
         }
-        if(currRoot.getData().equals(ROOT_LINE)){
+        if(currRoot.getData().equals(ROOT_LINE)){ // check that Scope brackets are balanced
             return currRoot;
         }
         else {
@@ -58,6 +55,10 @@ public class LineTree {
         String lastToken = tokens[tokens.length - 1];
         return lastToken.endsWith(SINGLE_LINE_SUFFIX);
     }
+    private boolean begOfNewScope(String[] tokens){
+        return (tokens[tokens.length - 1].endsWith(BEG_OF_SCOPE));
+    }
+
     private boolean endOfScopeCase(String[] tokens){
         return (tokens.length == 1) && tokens[0].equals(END_OF_SCOPE);
     }
