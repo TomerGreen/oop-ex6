@@ -20,4 +20,11 @@ public abstract class Variable {
         return type;
     }
 
+    /**
+     * Checks if assigned value is formatted properly for that variable type.
+     * @param value
+     * @return
+     */
+    public abstract boolean isValidValue(String value);
+
 }
