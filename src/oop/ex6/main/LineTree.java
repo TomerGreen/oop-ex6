@@ -1,3 +1,5 @@
+package oop.ex6.main;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 

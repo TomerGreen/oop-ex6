@@ -1,10 +1,14 @@
+package oop.ex6.main;
+
 public abstract class Variable {
 
     private String name;
 
     private String type;
 
-    private Boolean isFinal;
+    private boolean isFinal;
+
+    private boolean isInitialized;
 
 
     public Variable(String name, String type){

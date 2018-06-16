@@ -1,11 +1,13 @@
+package oop.ex6.main;
+
 import java.util.HashMap;
 
 public class GlobalScope extends Scope {
 
-    HashMap<String, Method> methods;
+    private HashMap<String, Method> methods;
 
-    public GlobalScope(LineTree root) {
-
+    public GlobalScope(LineTree tree) {
+        this.root = tree.root;
     }
 
 }
