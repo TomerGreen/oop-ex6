@@ -1,3 +1,5 @@
+package oop.ex6.main;
+
 import java.io.*;
 
 public class Sjava {
@@ -36,7 +38,6 @@ public class Sjava {
             System.err.println(FILE_FORMAT_ILLAGAL);
             System.err.println(BAD_FORMAT_ERROR);
         }
-
 
     }
 

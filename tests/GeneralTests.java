@@ -1,6 +1,7 @@
 import static org.junit.Assert.*;
 import org.junit.*;
 import java.util.regex.*;
+import oop.ex6.main.*;
 
 public class GeneralTests {
 
@@ -30,9 +31,38 @@ public class GeneralTests {
         assertTrue(final_var_matcher.matches());
         assertTrue(non_final_var_matcher.matches());
         assertTrue(final_var_matcher.group(1).equals("final"));
-        System.out.println(non_final_var_matcher.group(1));
-        System.out.println(non_final_var_matcher.group(2));
-        System.out.println(non_final_var_matcher.group(3));
-        System.out.println(non_final_var_matcher.group(4));
+    }
+
+    @Test
+    public void testVarDecRegex() {
+        String basic_dec = "boolean a;";
+        String basic_assignment = "boolean a=5;";
+        String basic_final_dec = "final int a=5;";
+        String basic_dec_with_spaces = "final double a = 5 ;";
+        String weird_name_dec = "char ___aaaa1234____111 = 1;";
+        String weird_value_dec = "String a = \"  ___  aaa 1111___ \";";
+        String multiple_vars = "final int a,b,c;";
+        String multiple_vars_with_spaces = "final int a , b , c ;";
+        String multiple_vars_with_assignments = "double a, b=5, c=0.5;";
+        String hard_multiple_vars = "final double __11__a, b1 = \"aaa\", c=0.55555aaaa, d,e , f = 123asdv.,; ;";
+        String missing_spaces1 = "finalint a=5;";
+        String missing_semicolon = "final int a";
+        String bad_var_name = "int 1a;";
+        String missing_spaces2 = "inta;";
+        assertTrue(VariableParser.isVarDec(basic_dec));
+        assertTrue(VariableParser.isVarDec(basic_assignment));
+        assertTrue(VariableParser.isVarDec(basic_final_dec));
+        assertTrue(VariableParser.isVarDec(basic_dec_with_spaces));
+        assertTrue(VariableParser.isVarDec(weird_name_dec));
+        assertTrue(VariableParser.isVarDec(weird_value_dec));
+        assertTrue(VariableParser.isVarDec(multiple_vars));
+        assertTrue(VariableParser.isVarDec(multiple_vars_with_spaces));
+        assertTrue(VariableParser.isVarDec(multiple_vars_with_assignments));
+        assertTrue(VariableParser.isVarDec(hard_multiple_vars));
+        assertFalse(VariableParser.isVarDec(missing_spaces1));
+        assertFalse(VariableParser.isVarDec(missing_semicolon));
+        assertFalse(VariableParser.isVarDec(bad_var_name));
+        assertFalse(VariableParser.isVarDec(missing_spaces2));
+
     }
 }

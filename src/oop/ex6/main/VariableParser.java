@@ -14,7 +14,7 @@ public class VariableParser {
             + VARIABLE_ASSIGNMENT_REGEX + ")?";
     private static final String VARIABLE_DECLARATION_REGEX = FINAL_VARIABLE_DECLARATION_PREFIX +
             VARIABLE_TYPES_REGEX + "(?:" + VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT + " ?, ?)*"
-            + VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT + " ;";
+            + VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT + " ?;";
 
     /**
      * Returns whether the given value is a valid variable name.
@@ -24,5 +24,12 @@ public class VariableParser {
      */
     public static boolean isValidVarName(String value) {
         return value.matches(LEGAL_VAR_NAME_REGEX);
+    }
+
+    /* Helper method for testing. Delete when submitting. */
+    public static boolean isVarDec(String value) {
+        System.out.println("Regex is:");
+        System.out.println(VARIABLE_DECLARATION_REGEX);
+        return value.matches(VARIABLE_DECLARATION_REGEX);
     }
 }
