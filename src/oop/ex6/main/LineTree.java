@@ -1,16 +1,18 @@
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LineTree {
 
-    private final static String COMMENT_PREFIX = "//";
+    ////////////////////////////////////////CONSTANTS////////////////////////////////////////////////////
+
+    private final static String COMMENT_PREFIX_REGEX = "(\\s*\\//\\s*)"; //todo check if can be spaces before comma
+    private final static String EMPTY_LINE_REGEX = "(\\s*)";
     private final static String ROOT_LINE = "class;";
-    private final static String SINGLE_LINE_SUFFIX = ";";
-    private final static String SPACES = "\\s";
-    private final static String METHOD_DEC = "void";
-    private final static String BEG_OF_SCOPE = "{";
-    private final static String END_OF_SCOPE = "}";
-    private final static int EMPTY = 0;
+    private final static String SINGLE_LINE_SUFFIX_REGEX = "(\\s*\\;\\s*)";
+    private final static String BEG_OF_SCOPE_REGEX = "(\\s*\\{\\s*)";
+    private final static String END_OF_SCOPE_REGEX = "(\\s*\\}\\s*)";
 
     ScopeNode root;
 
@@ -25,15 +27,22 @@ public class LineTree {
     private ScopeNode parser(BufferedReader br, ScopeNode currRoot) throws IOException, ExceptionFileFormat {
         String line;
         line = br.readLine();
+        Pattern begOfCommentPattern = Pattern.compile(COMMENT_PREFIX_REGEX);
+        Pattern singleLinePattern = Pattern.compile(SINGLE_LINE_SUFFIX_REGEX);
+        Pattern begOfScopePattern = Pattern.compile(BEG_OF_SCOPE_REGEX);
         while (line != null){
-            String[] tokens = line.split(SPACES);
-            if(!commentOrEmptyCase(line, tokens)){
-                if(singleLineCase(tokens))
+            Matcher begOfCommentMatcher = begOfCommentPattern.matcher(line);
+            Matcher singleLineMatcher = singleLinePattern.matcher(line); //todo think of transfer after the condition
+            Matcher begOfScopeMatcher = begOfScopePattern.matcher(line); //todo think of transfer after the condition
+            if(!(line.matches(EMPTY_LINE_REGEX)|| begOfCommentMatcher.find())){ // check that line isn't a comment or empty
+                if(singleLineMatcher.find()) {
                     currRoot.addSon(new ScopeNode(line, currRoot));
-                else if(begOfNewScope(tokens))
+                }
+                else if(begOfScopeMatcher.find()) {
                     currRoot.addSon(parser(br, new ScopeNode(line, currRoot)));
-                else if(endOfScopeCase(tokens) && currRoot.parrent != null)
-                    currRoot = currRoot.parrent;
+                }
+                else if(line.matches(END_OF_SCOPE_REGEX) && currRoot.parent != null)
+                    currRoot = currRoot.parent;
                 else
                     throw new ExceptionFileFormat();
             }
@@ -47,19 +56,5 @@ public class LineTree {
         }
     }
 
-    private boolean commentOrEmptyCase(String line, String[] tokens){
-        return ( line.startsWith(COMMENT_PREFIX) || (tokens.length == EMPTY) );
-    }
-
-    private boolean singleLineCase(String[] tokens){
-        String lastToken = tokens[tokens.length - 1];
-        return lastToken.endsWith(SINGLE_LINE_SUFFIX);
-    }
-    private boolean begOfNewScope(String[] tokens){
-        return (tokens[tokens.length - 1].endsWith(BEG_OF_SCOPE));
-    }
-
-    private boolean endOfScopeCase(String[] tokens){
-        return (tokens.length == 1) && tokens[0].equals(END_OF_SCOPE);
-    }
+    //todo think of adding "scope" argument to parser and then be able to raise "illegal scope ERROR" when needed
 }

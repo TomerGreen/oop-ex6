@@ -5,13 +5,13 @@ class ScopeNode {
     ArrayList<ScopeNode> sons;
 
     String data;
-    ScopeNode parrent;
+    ScopeNode parent;
 
 
-    public ScopeNode(String dataLine, ScopeNode parrent)
+    public ScopeNode(String dataLine, ScopeNode parent)
     {
         data = dataLine;
-        this.parrent = parrent;
+        this.parent = parent;
     }
 
     public void addSon(ScopeNode newSon){
