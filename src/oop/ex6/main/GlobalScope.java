@@ -49,7 +49,7 @@ public class GlobalScope extends Scope {
         ArrayList<Variable> argList = new ArrayList<>();
         String[] args = argsDeclare.split(COMMA);
         for(String arg : args){
-            argList.add(VaribleFactory.analyzeVariable(arg)); // todo change to explicit method call
+            //argList.add(VaribleFactory.analyzeVariable(arg)); // todo change to explicit method call
         }
         return argList;
     }

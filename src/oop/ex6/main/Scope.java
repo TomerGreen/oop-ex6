@@ -49,8 +49,9 @@ public abstract class Scope {
         // The assigned value is a variable.
         else if (VariableParser.isValidVarName(value)) {
             Variable assignee = getDefinedVariable(value);
-        }
-        else
+        } else {}
+        return false;
+    }
 
     /**
      * @param line
