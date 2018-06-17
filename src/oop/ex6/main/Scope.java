@@ -1,6 +1,8 @@
 package oop.ex6.main;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.regex.Pattern;
 
 public abstract class Scope {
@@ -29,12 +31,12 @@ public abstract class Scope {
     /**
      * A recursive method that looks for a variable with a given name and returns it.
      * Since it is recursive, it allows for a different implementation in ancestor scopes (for example,
-     * searching several variable tables).
+     * searching several variable tables). The only requirement for the returned variable is that it is ASSIGNABLE.
      * @param name The name of the variable to be searched.
      * @return The corresponding variable object.
      * @throws UnknownVariableException If the variable is not found in the local table, and the parent scope is null.
      */
-    private Variable getDefinedVariable(String name) throws UnknownVariableException {
+    protected Variable getDefinedVariable(String name) throws UnknownVariableException {
         if (this.variables.containsKey(name)) {
             return variables.get(name);
         }
@@ -42,6 +44,28 @@ public abstract class Scope {
             throw new UnknownVariableException("Variable name \"" + name + "\" is undefined.");
         }
         return parent.getDefinedVariable(name);
+    }
+
+    // TODO not sure if this method is necessary.
+    /**
+     * Returns whether the given variable name represents a defined and initialized variable.
+     * A usable variable name can be used as a method argument, or assigned to another variable.
+     * @param varName The given variable name.
+     * @return Whether it is usable.
+     * @throws UnknownVariableException If the variable is not defined (unassignable).
+     */
+    protected boolean isVarnameUsable(String varName) throws UnknownVariableException {
+        Variable var = getDefinedVariable(varName);
+        return var.isInitialized();
+    }
+
+    /**
+     * Whether a given variable name may be declared as a new variable.
+     * @param varName The given var name.
+     * @return Whether it is definable.
+     */
+    protected boolean isVarnameDeclarable(String varName) {
+        return !this.variables.containsKey(varName);
     }
 
     /**
@@ -87,22 +111,55 @@ public abstract class Scope {
         }
     }
 
-    /**
+    // TODO consider this method.
+    /*
      * Initializes a variable if the assignment is valid.
      * @param var The variable to initialize
      * @param value The assigned value.
      * @throws UnknownVariableException If the assigned value is an undefined varname.
      * @throws InvalidAssignmentException If the assignment is otherwise invalid.
-     */
+
     private void assignValue(Variable var, String value) throws InvalidAssignmentException,
             UnitializedVariableUsageException, UnknownVariableException {
         if (isValidAssignment(var, value)) {
             var.initialize();
         }
     }
+    */
 
-    private void parseVarDeclaration(String line) {
-        if ()
+    private void parseVarDeclaration(String varDecLine) throws SyntaxException, UnfamiliarVariableTypeException,
+            VariableDeclarationException {
+        String currToken;  // The current token.
+        boolean isFinal = false;  // Whether the declared variables are final.
+        String type;  // The type name of the declared variables.
+        Variable currVar;  // The current variable object being parsed.
+        String currVarName;  // The name of the current variable being parsed.
+        Iterator<String> tokenIterator = VariableParser.getTokenizedVarDeclaration(varDecLine).iterator();
+        currToken = tokenIterator.next();  // Either final or null.
+        if (currToken != null && currToken.equals("final")) {
+            isFinal = true;
+        }
+        // next is type name.
+        type = tokenIterator.next();
+        currToken = tokenIterator.next();  // Must be a var name.
+        while (currToken != null) {  // In each iteration the current token is either a var name or null.
+            currVarName = currToken;
+            if (isVarnameDeclarable(currVarName)) {
+                currVar = VariableParser.createVariable(currToken, type, isFinal);
+            }
+            else {
+                throw new VariableDeclarationException(currVarName);
+            }
+            // At this point the variable name is declarable.
+            currVar = VariableParser.createVariable(currToken, type, isFinal);
+
+            
+            tokenAfterName = tokenIterator.next();  // current token is either "=" or null.
+            if (tokenAfterName.equals("=")) {
+                currVar.initialize();
+            }
+            assignee = tokenIterator.next();  // Current token is an assigned value or null.
+        }
     }
 
     /**

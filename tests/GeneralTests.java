@@ -1,5 +1,6 @@
 import oop.ex6.main.ExceptionFileFormat;
 import oop.ex6.main.LineTree;
+import oop.ex6.main.Variable;
 import oop.ex6.main.VariableParser;
 import org.junit.*;
 
@@ -55,6 +56,7 @@ public class GeneralTests {
 
     @Test
     public void testVarDecRegex() {
+        assertFalse("\n".matches("."));
         String basic_dec = "boolean a;";
         String basic_assignment = "boolean a=5;";
         String basic_final_dec = "final int a=5;";
@@ -69,6 +71,8 @@ public class GeneralTests {
         String missing_semicolon = "final int a";
         String bad_var_name = "int 1a;";
         String missing_spaces2 = "inta;";
+        String only_equal_sign = "int a = ;";
+        String only_equal_sign_multiple = "int a = 5, b=, c;";
         assertTrue(VariableParser.isVarDec(basic_dec));
         assertTrue(VariableParser.isVarDec(basic_assignment));
         assertTrue(VariableParser.isVarDec(basic_final_dec));
@@ -83,7 +87,8 @@ public class GeneralTests {
         assertFalse(VariableParser.isVarDec(missing_semicolon));
         assertFalse(VariableParser.isVarDec(bad_var_name));
         assertFalse(VariableParser.isVarDec(missing_spaces2));
-
+        assertTrue(VariableParser.isVarDec(only_equal_sign));
+        assertTrue(VariableParser.isVarDec(only_equal_sign_multiple));
     }
 
     @Test
