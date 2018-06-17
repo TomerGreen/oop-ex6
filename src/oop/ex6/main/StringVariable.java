@@ -5,6 +5,8 @@ package oop.ex6.main;
  */
 public class StringVariable extends Variable {
 
+    private static final String typeName = "String";
+
     private static final String VALID_STRING_VALUE = "\".*\"";
 
     /**
@@ -14,6 +16,11 @@ public class StringVariable extends Variable {
      */
     public StringVariable(String name, boolean isFinal) {
         super(name, isFinal);
+    }
+
+    @Override
+    public String getTypeName() {
+        return typeName;
     }
 
     @Override

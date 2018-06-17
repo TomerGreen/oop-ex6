@@ -5,6 +5,8 @@ package oop.ex6.main;
  */
 public class CharVariable extends Variable {
 
+    private static final String typeName = "char";
+
     private static final String VALID_CHAR_VALUE = "'.'";
 
     /**
@@ -14,6 +16,11 @@ public class CharVariable extends Variable {
      */
     public CharVariable(String name, boolean isFinal) {
         super(name, isFinal);
+    }
+
+    @Override
+    public String getTypeName() {
+        return typeName;
     }
 
     @Override

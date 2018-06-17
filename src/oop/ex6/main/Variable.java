@@ -2,6 +2,8 @@ package oop.ex6.main;
 
 public abstract class Variable {
 
+    protected static String typeName;
+
     /* The varname */
     private String name;
 
@@ -24,6 +26,11 @@ public abstract class Variable {
     public String getName(){
         return name;
     }
+
+    /**
+     * @return The name of the variable type.
+     */
+    public abstract String getTypeName();
 
     /**
      * @return Whether the variable was declared as final.

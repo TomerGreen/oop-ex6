@@ -1,6 +1,7 @@
 package oop.ex6.main;
 
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 public abstract class Scope {
 
@@ -40,17 +41,60 @@ public abstract class Scope {
      * @param var The variable object to which we want to assign.
      * @param value The value or name of the variable to be assigned.
      * @return Whether the assignment is valid.
+     * @throws InvalidAssignmentException If the assignment is invalid for
      */
-    private boolean isValidValueAssignment(Variable var, String value) throws InvalidAssignmentException,
-            UnknownVariableException {
+    private boolean isValidAssignment(Variable var, String value) throws InvalidAssignmentException,
+            UnknownVariableException, UnitializedVariableUsageException {
         if (var.isFinal() && var.isInitialized()) {
             throw new InvalidAssignmentException("Cannot assign value to final variable after declaration.");
         }
         // The assigned value is a variable.
-        else if (VariableParser.isValidVarName(value)) {
-            Variable assignee = getDefinedVariable(value);
-        } else {}
-        return false;
+        else if (VariableParser.isLegalVarName(value)) {
+            Variable assignee = getDefinedVariable(value);  // Throws exception if assignee wasn't returned.
+            if (assignee.isInitialized()) {
+                // todo TEST!!!
+                if (var.getClass().isInstance(assignee)) {
+                    return true;
+                }
+                // Trying to assign var with invalid type.
+                else {
+                    throw new InvalidAssignmentException("Cannot assign variable of type '" + assignee.getTypeName()
+                            + "' to variable of type '" + var.getTypeName() + "'.");
+                }
+            }
+            // Trying to assign uninitialized variable.
+            else {
+                throw new UnitializedVariableUsageException(assignee);
+            }
+        }
+        // The assigned value is primitive, i.e "hello" , '@' , 5. , 3.2 etc.
+        else {
+            if (var.isValidValue(value)) {
+                return true;
+            }
+            else {
+                throw new InvalidAssignmentException("Cannot assign value " + value + " to variable of type "
+                        + var.getTypeName() + ".");
+            }
+        }
+    }
+
+    /**
+     * Initializes a variable if the assignment is valid.
+     * @param var The variable to initialize
+     * @param value The assigned value.
+     * @throws UnknownVariableException If the assigned value is an undefined varname.
+     * @throws InvalidAssignmentException If the assignment is otherwise invalid.
+     */
+    private void assignValue(Variable var, String value) throws InvalidAssignmentException,
+            UnitializedVariableUsageException, UnknownVariableException {
+        if (isValidAssignment(var, value)) {
+            var.initialize();
+        }
+    }
+
+    private void parseVarDeclaration(String line) {
+        if ()
     }
 
     /**

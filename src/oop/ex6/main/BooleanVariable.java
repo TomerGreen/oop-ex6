@@ -5,6 +5,8 @@ package oop.ex6.main;
  */
 public class BooleanVariable extends Variable {
 
+    private static final String typeName = "boolean";
+
     private static final String VALID_BOOLEAN_VALUE = "true|false|-?\\d+(?:.\\d+)?";
 
     /**
@@ -14,6 +16,11 @@ public class BooleanVariable extends Variable {
      */
     public BooleanVariable(String name, boolean isFinal) {
         super(name, isFinal);
+    }
+
+    @Override
+    public String getTypeName() {
+        return typeName;
     }
 
     @Override

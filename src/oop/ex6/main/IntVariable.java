@@ -5,6 +5,8 @@ package oop.ex6.main;
  */
 public class IntVariable extends DoubleVariable {
 
+    private static final String typeName = "int";
+
     private static final String VALID_INT_VALUE = "-?\\d+";
 
     /**
@@ -19,5 +21,10 @@ public class IntVariable extends DoubleVariable {
     @Override
     public boolean isValidValue(String value) {
         return value.matches(VALID_INT_VALUE);
+    }
+
+    @Override
+    public String getTypeName() {
+        return typeName;
     }
 }

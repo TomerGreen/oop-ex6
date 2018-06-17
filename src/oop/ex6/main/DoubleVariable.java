@@ -5,6 +5,8 @@ package oop.ex6.main;
  */
 public class DoubleVariable extends BooleanVariable {
 
+    private static final String typeName = "double";
+
     private static final String VALID_DOUBLE_VALUE = "-?\\d+(?:.\\d+)";
 
     /**
@@ -19,5 +21,10 @@ public class DoubleVariable extends BooleanVariable {
     @Override
     public boolean isValidValue(String value) {
         return value.matches(VALID_DOUBLE_VALUE);
+    }
+
+    @Override
+    public String getTypeName() {
+        return typeName;
     }
 }

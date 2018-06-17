@@ -27,7 +27,7 @@ public class VariableParser {
      * @param value The potential variable name to be checked.
      * @return Whether it is a valid variable name.
      */
-    public static boolean isValidVarName(String value) {
+    public static boolean isLegalVarName(String value) {
         return value.matches(LEGAL_VAR_NAME_REGEX);
     }
 
@@ -37,4 +37,6 @@ public class VariableParser {
         System.out.println(VARIABLE_DECLARATION_REGEX);
         return value.matches(VARIABLE_DECLARATION_REGEX);
     }
+
+
 }
