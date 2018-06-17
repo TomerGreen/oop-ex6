@@ -1,7 +1,5 @@
 package oop.ex6.main;
 
-<<<<<<< HEAD
-=======
 import java.util.regex.*;
 
 /**
@@ -9,7 +7,6 @@ import java.util.regex.*;
  * All variable-related conventions are handled in this class and only in it. This class does not handle
  * validation relating to existing variable names.
  */
->>>>>>> e4657c340a3fa7a1d5de9ead34743be3ab6642d8
 public class VariableParser {
 
     private static final String FINAL_VARIABLE_DECLARATION_PREFIX = "(?:(final) )?";
