@@ -2,23 +2,23 @@ package oop.ex6.main;
 
 import java.util.ArrayList;
 
-class ScopeNode {
+class LineNode {
 
-    ArrayList<ScopeNode> sons;
+    ArrayList<LineNode> sons;
 
     String data;
-    ScopeNode parent;
+    LineNode parent;
     int lineNumber;
 
 
-    public ScopeNode(String dataLine, ScopeNode parent, int lineNumber)
+    public LineNode(String dataLine, LineNode parent, int lineNumber)
     {
         data = dataLine;
         this.parent = parent;
         this.lineNumber = lineNumber;
     }
 
-    public void addSon(ScopeNode newSon){
+    public void addSon(LineNode newSon){
         sons.add(newSon);
     }
 
