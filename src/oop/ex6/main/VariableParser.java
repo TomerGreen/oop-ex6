@@ -2,6 +2,11 @@ package oop.ex6.main;
 
 import java.util.regex.*;
 
+/**
+ * A factory class in charge of all creation and validation of variable declaration assignments.
+ * All variable-related conventions are handled in this class and only in it. This class does not handle
+ * validation relating to existing variable names.
+ */
 public class VariableParser {
 
     private static final String FINAL_VARIABLE_DECLARATION_PREFIX = "(?:(final) )?";
@@ -26,7 +31,7 @@ public class VariableParser {
         return value.matches(LEGAL_VAR_NAME_REGEX);
     }
 
-    /* Helper method for testing. Delete when submitting. */
+    /* todo - helper method for testing. Delete when submitting. */
     public static boolean isVarDec(String value) {
         System.out.println("Regex is:");
         System.out.println(VARIABLE_DECLARATION_REGEX);

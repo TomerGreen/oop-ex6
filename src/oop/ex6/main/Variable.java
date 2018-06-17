@@ -2,26 +2,48 @@ package oop.ex6.main;
 
 public abstract class Variable {
 
+    /* The varname */
     private String name;
 
-    private String type;
-
+    /* Whether the variable is defined as final. */
     private boolean isFinal;
 
+    /* Whether the variable was set an initial value. */
     private boolean isInitialized;
 
 
-    public Variable(String name, String type){
+    public Variable(String name, boolean isFinal) {
         this.name = name;
-        this.type = type;
+        this.isFinal = isFinal;
+        isInitialized = false;
     }
 
+    /**
+     * @return The variable's name.
+     */
     public String getName(){
         return name;
     }
 
-    public String getType(){
-        return type;
+    /**
+     * @return Whether the variable was declared as final.
+     */
+    public boolean isFinal() {
+        return isFinal;
+    }
+
+    /**
+     * @return Whether the variable was assigned an initial value.
+     */
+    public boolean isInitialized() {
+        return isInitialized;
+    }
+
+    /**
+     * Makes the variable initialized
+     */
+    public void initialize(){
+        isInitialized = true;
     }
 
     /**
