@@ -1,3 +1,5 @@
+package oop.ex6.main;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -16,7 +18,7 @@ public class LineTree {
 
     ScopeNode root;
 
-    LineTree(BufferedReader br) throws IOException, ExceptionFileFormat {
+    public LineTree(BufferedReader br) throws IOException, ExceptionFileFormat {
         root = parser(br, new ScopeNode(ROOT_LINE, null));
     }
 

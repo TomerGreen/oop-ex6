@@ -1,4 +1,7 @@
+
+package oop.ex6.main;
 import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,11 +15,10 @@ public class GlobalScope extends Scope {
     static final String METHODS_SECOND_PART_REGEX = "\\)\\s*\\{\\s*";
     static final String COMMA = ",";
 
+    private HashMap<String, Method> methods;
 
-    HashMap<String, Method> methods;
-
-    public GlobalScope(LineTree root) {
-
+    public GlobalScope(LineTree tree) {
+        this.root = tree.root;
     }
 
     private void MethodDecAnalyezer(String deceleration) throws ExceptionFileFormat {
@@ -47,7 +49,8 @@ public class GlobalScope extends Scope {
         ArrayList<Variable> argList = new ArrayList<>();
         String[] args = argsDeclare.split(COMMA);
         for(String arg : args){
-            argList.add(VaribleFactory.analyzeVariable(arg));
+            argList.add(VaribleFactory.analyzeVariable(arg)); // todo change to explicit method call
         }
+        return argList;
     }
 }

@@ -1,3 +1,5 @@
+package oop.ex6.main;
+
 import java.io.IOException;
 
 public class ExceptionArgs extends IOException{

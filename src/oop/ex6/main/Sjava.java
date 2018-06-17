@@ -1,3 +1,5 @@
+package oop.ex6.main;
+
 import java.io.*;
 
 public class Sjava {
@@ -10,7 +12,7 @@ public class Sjava {
     private final static String PARAMETERS_ERROR = "2";
     private final static String SJAVA_TYPE = "Sjava";
     private final static String ARGUMENTS_ERROR = "arguments error";
-    private final static String FILE_FORMAT_ILLAGAL = "file format illegal";
+    private final static String FILE_FORMAT_ILLEGAL = "file format illegal";
 
 
     public void main(String args[]){
@@ -21,7 +23,7 @@ public class Sjava {
             BufferedReader br = new BufferedReader(new FileReader(SjavaFile));
             //here we parse the text sjava file to tree of nested scopes
             LineTree parsedFile = new LineTree(br);
-            //here we analyze all the relevant data in the main class scope (A.K.A global)
+            //here we analyze all the relevant data in the main1 class scope (A.K.A global)
 
             GlobalScope gllobalTable = new GlobalScope(parsedFile);
 
@@ -33,7 +35,7 @@ public class Sjava {
             System.err.println(ARGUMENTS_ERROR);
             System.err.println(PARAMETERS_ERROR);
         } catch (ExceptionFileFormat exceptionFileFormat) {
-            System.err.println(FILE_FORMAT_ILLAGAL);
+            System.err.println(FILE_FORMAT_ILLEGAL);
             System.err.println(BAD_FORMAT_ERROR);
         }
 
