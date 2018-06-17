@@ -1,14 +1,19 @@
-import static org.junit.Assert.*;
-
 import oop.ex6.main.ExceptionFileFormat;
 import oop.ex6.main.LineTree;
+import oop.ex6.main.VariableParser;
 import org.junit.*;
-import java.io.*;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import oop.ex6.main.*;
+
+import static jdk.nashorn.internal.objects.NativeString.trim;
+import static org.junit.Assert.*;
 
 public class GeneralTests {
 
@@ -21,15 +26,10 @@ public class GeneralTests {
 
     @Test
     public void testSplit() {
-        String line = "                    a b  c";
-//        String[] tokens = line.split("\\s");
-        List<String> tokens = Arrays.asList(line.split("\\s*"));
-//        tokens.remove("");
-        for (String token : tokens) {
-                System.out.println("'" + token + "'");
-        }
-//        assertTrue(tokens.length == 3);
-        assertEquals(3, tokens.size());
+        String line1 = "   a b              c   ";
+        line1 = trim(line1).replaceAll("\\s+"," ");
+        assertEquals("a b c", line1);
+
     }
 
     @Test

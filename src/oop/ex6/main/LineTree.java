@@ -5,21 +5,27 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static jdk.nashorn.internal.objects.NativeString.trim; // todo better import
+
+
 public class LineTree {
 
     ////////////////////////////////////////CONSTANTS////////////////////////////////////////////////////
-
-    private final static String COMMENT_PREFIX_REGEX = "(\\s*\\//\\s*)"; //todo check if can be spaces before comma
-    private final static String EMPTY_LINE_REGEX = "(\\s*)";
+////////////////////todo "more elegant" regex (now that line whitespaces are organized
+    private final static String COMMENT_PREFIX_REGEX = "(//\\s*)";
+    private final static String EMPTY_LINE = "";
     private final static String ROOT_LINE = "class;";
-    private final static String SINGLE_LINE_SUFFIX_REGEX = "(\\s*\\;\\s*)";
-    private final static String BEG_OF_SCOPE_REGEX = "(\\s*\\{\\s*)";
-    private final static String END_OF_SCOPE_REGEX = "(\\s*\\}\\s*)";
+    private final static String SINGLE_LINE_SUFFIX_REGEX = " (\\;)";
+    private final static String BEG_OF_SCOPE_REGEX = "(\\s*\\{)";
+    private final static String END_OF_SCOPE_REGEX = "(\\})";
 
     ScopeNode root;
 
+    private int lineNumber;
+
     public LineTree(BufferedReader br) throws IOException, ExceptionFileFormat {
-        root = parser(br, new ScopeNode(ROOT_LINE, null));
+        lineNumber = 0;
+        root = parser(br, new ScopeNode(ROOT_LINE, null, lineNumber));
     }
 
     /**
@@ -28,7 +34,7 @@ public class LineTree {
      */
     private ScopeNode parser(BufferedReader br, ScopeNode currRoot) throws IOException, ExceptionFileFormat {
         String line;
-        line = br.readLine();
+        line = getLine(br);
         Pattern begOfCommentPattern = Pattern.compile(COMMENT_PREFIX_REGEX);
         Pattern singleLinePattern = Pattern.compile(SINGLE_LINE_SUFFIX_REGEX);
         Pattern begOfScopePattern = Pattern.compile(BEG_OF_SCOPE_REGEX);
@@ -36,19 +42,19 @@ public class LineTree {
             Matcher begOfCommentMatcher = begOfCommentPattern.matcher(line);
             Matcher singleLineMatcher = singleLinePattern.matcher(line); //todo think of transfer after the condition
             Matcher begOfScopeMatcher = begOfScopePattern.matcher(line); //todo think of transfer after the condition
-            if(!(line.matches(EMPTY_LINE_REGEX)|| begOfCommentMatcher.find())){ // check that line isn't a comment or empty
+            if(!(line.matches(EMPTY_LINE)|| begOfCommentMatcher.find())){ // check that line isn't a comment or empty
                 if(singleLineMatcher.find()) {
-                    currRoot.addSon(new ScopeNode(line, currRoot));
+                    currRoot.addSon(new ScopeNode(line, currRoot, lineNumber));
                 }
                 else if(begOfScopeMatcher.find()) {
-                    currRoot.addSon(parser(br, new ScopeNode(line, currRoot)));
+                    currRoot.addSon(parser(br, new ScopeNode(line, currRoot, lineNumber)));
                 }
                 else if(line.matches(END_OF_SCOPE_REGEX) && currRoot.parent != null)
                     currRoot = currRoot.parent;
                 else
                     throw new ExceptionFileFormat();
             }
-            line = br.readLine();
+            line = getLine(br);
         }
         if(currRoot.getData().equals(ROOT_LINE)){ // check that Scope brackets are balanced
             return currRoot;
@@ -58,5 +64,13 @@ public class LineTree {
         }
     }
 
-    //todo think of adding "scope" argument to parser and then be able to raise "illegal scope ERROR" when needed
+    private String getLine(BufferedReader br) throws IOException {
+        lineNumber++;
+        String line = br.readLine();
+        if(line == null)
+            return null;
+        else
+            return trim(line).replaceAll("\\s+"," ");
+    }
+
 }

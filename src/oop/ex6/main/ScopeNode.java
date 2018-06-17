@@ -8,12 +8,14 @@ class ScopeNode {
 
     String data;
     ScopeNode parent;
+    int lineNumber;
 
 
-    public ScopeNode(String dataLine, ScopeNode parent)
+    public ScopeNode(String dataLine, ScopeNode parent, int lineNumber)
     {
         data = dataLine;
         this.parent = parent;
+        this.lineNumber = lineNumber;
     }
 
     public void addSon(ScopeNode newSon){
@@ -24,6 +26,6 @@ class ScopeNode {
         return data;
     }
 
-    //todo think about parent attribute
+
 
 }
