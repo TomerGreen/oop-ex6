@@ -3,18 +3,12 @@ import static org.junit.Assert.*;
 import oop.ex6.main.ExceptionFileFormat;
 import oop.ex6.main.LineTree;
 import org.junit.*;
-<<<<<<< HEAD
-
 import java.io.*;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-=======
-import java.util.regex.*;
 import oop.ex6.main.*;
->>>>>>> e4657c340a3fa7a1d5de9ead34743be3ab6642d8
 
 public class GeneralTests {
 
@@ -29,7 +23,7 @@ public class GeneralTests {
     public void testSplit() {
         String line = "                    a b  c";
 //        String[] tokens = line.split("\\s");
-        List<String> tokens = Arrays.asList(line.split("\\s"));
+        List<String> tokens = Arrays.asList(line.split("\\s*"));
 //        tokens.remove("");
         for (String token : tokens) {
                 System.out.println("'" + token + "'");
