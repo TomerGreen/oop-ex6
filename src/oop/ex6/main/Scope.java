@@ -2,11 +2,18 @@ package oop.ex6.main;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class Scope {
-
+    
+    ////////////////////////////////////CONSTANTS////////////////////////////;
+    private static final String OPEN_BRACKET = "{";
+    protected static final String RETURN = "return";
+    protected static final String METHOD_NAME_REGEX = "([a-zA-z]+\\w*)";
+    private static final String METHOD_CALL_REGEX = METHOD_NAME_REGEX + " ?\\(";
+    protected static final String METHODS_SECOND_PART_REGEX = "\\) ?\\{";
+    
     /** The root of the line tree that represents this scope. */
     protected LineNode root;
 
@@ -169,5 +176,26 @@ public abstract class Scope {
     private Variable[] parseVariableDec(String line) {
         return null;
     }
+        //todo
 
+    void verifyScope(){
+        Pattern begLinePattern = Pattern.compile(METHOD_CALL_REGEX);
+        Pattern endLinePattern = Pattern.compile(METHODS_SECOND_PART_REGEX);
+        for (LineNode son : root.sons) {
+            String openingLine = son.data;
+            Matcher begLineMatcher = begLinePattern.matcher(openingLine);
+            Matcher endLineMatcher = endLinePattern.matcher(openingLine);
+            if(openingLine.endsWith(OPEN_BRACKET))
+                new ConditionScope(son, this);
+            else if(openingLine.matches(RETURN)){ } //important (end of method) return line are considered previously
+            else if(begLineMatcher.find() && endLineMatcher.find()){
+                methodCallVerify(this, openingLine);
+            }
+            //todo varAssignAnalyzer(line) and varDecAnalyzer(line) which update the var table
+        }
+    }
+
+    void methodCallVerify(Scope callingScope, String line){
+
+    }
 }
