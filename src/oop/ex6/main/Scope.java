@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 public abstract class Scope {
 
     /** The root of the line tree that represents this scope. */
-    protected ScopeNode root;
+    protected LineNode root;
 
     /** The variables that were defined locally in the statement. */
     protected HashMap<String, Variable> variables;
@@ -16,6 +16,14 @@ public abstract class Scope {
 
     /** The global statement this statement is a part of. */
     GlobalScope global;
+
+    protected Scope(){}
+
+    protected Scope(LineNode root, Scope parent){
+        this.root = root;
+        this.parent = parent;
+        variables = new HashMap<>();
+    }
 
 
     /**
