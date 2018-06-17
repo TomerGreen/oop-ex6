@@ -11,7 +11,6 @@ import static jdk.nashorn.internal.objects.NativeString.trim; // todo better imp
 public class LineTree {
 
     ////////////////////////////////////////CONSTANTS////////////////////////////////////////////////////
-////////////////////todo "more elegant" regex (now that line whitespaces are organized
     private final static String COMMENT_PREFIX_REGEX = "(//)";
     private final static String EMPTY_LINE = "";
     private final static String ROOT_LINE = "class;";

@@ -11,7 +11,9 @@ public class GlobalScope extends Scope {
     ///////////////////////CONSTANTS////////////////////////
 
     private static final String VOID = "void";
+
     private static final String COMMA = ",";
+    private static final String NO_RETURN_EXCEPTION = "NoReturnException";
 
     private HashMap<String, MethodScope> methods;
 
@@ -32,9 +34,13 @@ public class GlobalScope extends Scope {
         }
     }
 
-    private void verifyAllMethods(){
+    private void verifyAllMethods() throws NoReturnException {
         for (Map.Entry<String, MethodScope> method: methods.entrySet()){
-            method.getValue().verifyMethod();
+            MethodScope currMethod = method.getValue();
+            ArrayList<LineNode> methodBody = currMethod.root.sons;
+            if(!methodBody.get(methodBody.size() -1).data.equals(RETURN))
+                throw new NoReturnException(NO_RETURN_EXCEPTION);
+            currMethod.verifyScope();
         }
     }
 }
