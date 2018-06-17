@@ -39,7 +39,6 @@ public class Sjava {
             System.err.println(BAD_FORMAT_ERROR);
         }
 
-
     }
 
 
