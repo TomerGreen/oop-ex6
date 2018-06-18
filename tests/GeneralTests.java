@@ -1,15 +1,12 @@
 import oop.ex6.main.ExceptionFileFormat;
 import oop.ex6.main.LineTree;
-import oop.ex6.main.Variable;
-import oop.ex6.main.VariableParser;
+import oop.ex6.variables.VariableParser;
 import org.junit.*;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

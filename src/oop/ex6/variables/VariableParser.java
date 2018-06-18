@@ -1,4 +1,8 @@
-package oop.ex6.main;
+package oop.ex6.variables;
+
+import oop.ex6.main.SyntaxException;
+import oop.ex6.main.UnfamiliarVariableTypeException;
+import oop.ex6.variables.*;
 
 import java.util.LinkedList;
 import java.util.regex.*;

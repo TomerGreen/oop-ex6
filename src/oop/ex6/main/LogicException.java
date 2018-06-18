@@ -12,4 +12,13 @@ public abstract class LogicException extends Exception {
     protected LogicException(String message) {
         super(message);
     }
+
+    /**
+     * A constructor with a cause variable.
+     * @param message The error message.
+     * @param cause The cause exception.
+     */
+    protected LogicException(String message, Exception cause) {
+        super(message, cause);
+    }
 }

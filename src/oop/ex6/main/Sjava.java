@@ -1,5 +1,7 @@
 package oop.ex6.main;
 
+import oop.ex6.oop.ex6.scopes.GlobalScope;
+
 import java.io.*;
 
 public class Sjava {

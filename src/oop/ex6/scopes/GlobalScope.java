@@ -1,10 +1,10 @@
-package oop.ex6.main;
+package oop.ex6.scopes;
+
+import oop.ex6.main.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class GlobalScope extends Scope {
 
@@ -18,14 +18,14 @@ public class GlobalScope extends Scope {
     private HashMap<String, MethodScope> methods;
 
     public GlobalScope(LineTree tree) {
-        super(tree.root, null);
+        super(tree.getRoot(), null);
         methods = new HashMap<>();
 
     }
 
     private void analyzeGlobalScope() throws ExceptionFileFormat {
-        for (LineNode declerLine : root.sons) {
-            String line = declerLine.data;
+        for (LineNode declerLine : root.getSons()) {
+            String line = declerLine.getData();
             if (line.startsWith(VOID))
                 new MethodScope(declerLine, this);
             else {
@@ -37,8 +37,8 @@ public class GlobalScope extends Scope {
     private void verifyAllMethods() throws NoReturnException {
         for (Map.Entry<String, MethodScope> method: methods.entrySet()){
             MethodScope currMethod = method.getValue();
-            ArrayList<LineNode> methodBody = currMethod.root.sons;
-            if(!methodBody.get(methodBody.size() -1).data.equals(RETURN))
+            ArrayList<LineNode> methodBody = currMethod.root.getSons();
+            if(!methodBody.get(methodBody.size() -1).getData().equals(RETURN))
                 throw new NoReturnException(NO_RETURN_EXCEPTION);
             currMethod.verifyScope();
         }

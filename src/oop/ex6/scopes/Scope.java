@@ -1,4 +1,8 @@
-package oop.ex6.main;
+package oop.ex6.scopes;
+
+import oop.ex6.main.*;
+import oop.ex6.variables.Variable;
+import oop.ex6.variables.VariableParser;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -79,21 +83,26 @@ public abstract class Scope {
      * Checks if the assignment of the given value or variable to the given variable is legal.
      * @param var The variable object to which we want to assign.
      * @param value The value or name of the variable to be assigned.
-     * @return Whether the assignment is valid.
-     * @throws InvalidAssignmentException If the assignment is invalid for
+     * @throws UninitializedVariableUsageException When trying to assign uninitialized variable.
+     * @throws InvalidAssignmentException If the assignment is invalid for any other reason.
      */
-    private boolean isValidAssignment(Variable var, String value) throws InvalidAssignmentException,
-            UnknownVariableException, UnitializedVariableUsageException {
+    protected void verifyValueAssignment(Variable var, String value) throws InvalidAssignmentException,
+            UninitializedVariableUsageException {
         if (var.isFinal() && var.isInitialized()) {
             throw new InvalidAssignmentException("Cannot assign value to final variable after declaration.");
         }
         // The assigned value is a variable.
         else if (VariableParser.isLegalVarName(value)) {
-            Variable assignee = getDefinedVariable(value);  // Throws exception if assignee wasn't returned.
+            Variable assignee = null;  // Throws exception if assignee wasn't returned.
+            try {
+                assignee = getDefinedVariable(value);
+            } catch (UnknownVariableException e) {
+                throw new InvalidAssignmentException(e.getMessage(), e);
+            }
             if (assignee.isInitialized()) {
                 // todo TEST!!!
                 if (var.getClass().isInstance(assignee)) {
-                    return true;
+                    return;
                 }
                 // Trying to assign var with invalid type.
                 else {
@@ -103,13 +112,13 @@ public abstract class Scope {
             }
             // Trying to assign uninitialized variable.
             else {
-                throw new UnitializedVariableUsageException(assignee);
+                throw new UninitializedVariableUsageException(assignee);
             }
         }
         // The assigned value is primitive, i.e "hello" , '@' , 5. , 3.2 etc.
         else {
             if (var.isValidValue(value)) {
-                return true;
+                return;
             }
             else {
                 throw new InvalidAssignmentException("Cannot assign value " + value + " to variable of type "
@@ -127,62 +136,71 @@ public abstract class Scope {
      * @throws InvalidAssignmentException If the assignment is otherwise invalid.
 
     private void assignValue(Variable var, String value) throws InvalidAssignmentException,
-            UnitializedVariableUsageException, UnknownVariableException {
+            UninitializedVariableUsageException, UnknownVariableException {
         if (isValidAssignment(var, value)) {
             var.initialize();
         }
     }
     */
 
-    private void parseVarDeclaration(String varDecLine) throws SyntaxException, UnfamiliarVariableTypeException,
-            VariableDeclarationException {
+    /**
+     * Receives a potentially valid variable declaration line, and creates the appropriate variables in the
+     * scope's symbol table.
+     * @param varDecLine The variable declaration line.
+     * @throws InvalidVariableDeclarationException When anything is wrong in the declaration.
+     */
+    protected void parseVarDeclaration(String varDecLine) throws InvalidVariableDeclarationException {
         String currToken;  // The current token.
         boolean isFinal = false;  // Whether the declared variables are final.
         String type;  // The type name of the declared variables.
         Variable currVar;  // The current variable object being parsed.
         String currVarName;  // The name of the current variable being parsed.
-        Iterator<String> tokenIterator = VariableParser.getTokenizedVarDeclaration(varDecLine).iterator();
-        currToken = tokenIterator.next();  // Either final or null.
-        if (currToken != null && currToken.equals("final")) {
-            isFinal = true;
+        try {
+            Iterator<String> tokenIterator = VariableParser.getTokenizedVarDeclaration(varDecLine).iterator();
+            currToken = tokenIterator.next();  // Either final or null.
+            if (currToken != null && currToken.equals("final")) {
+                isFinal = true;
+            }
+            // next is type name.
+            type = tokenIterator.next();
+            currToken = tokenIterator.next();  // Must be a var name.
+            while (currToken != null) {  // In each iteration the current token is either a var name or null.
+                currVarName = currToken;
+                if (isVarnameDeclarable(currVarName)) {
+                    currVar = VariableParser.createVariable(currToken, type, isFinal);
+                } else {
+                    throw new InvalidVariableDeclarationException("Cannot override declared variable '" + currVarName + "'.");
+                }
+                // At this point the variable name is declarable.
+                currToken = tokenIterator.next();  // Current token is "=" or null.
+                if (currToken.equals("=")) {
+                    currVar.initialize();  // Initializing at this point so we can assign to final vars without errors.
+                    currToken = tokenIterator.next();  // Current token is an assigned value.
+                    verifyValueAssignment(currVar, currToken);
+                }
+                // No assignment. A null token is expected, but this is verified by regex.
+                else {
+                    tokenIterator.next();  // null.
+                }
+                if (currVar.isFinal() && !currVar.isInitialized()) {
+                    throw new InvalidVariableDeclarationException("Variable '" + currVarName
+                            + "' is declared final but is not initialized.");
+                }
+                variables.put(currVarName, currVar);
+                currToken = tokenIterator.next();
+            }
         }
-        // next is type name.
-        type = tokenIterator.next();
-        currToken = tokenIterator.next();  // Must be a var name.
-        while (currToken != null) {  // In each iteration the current token is either a var name or null.
-            currVarName = currToken;
-            if (isVarnameDeclarable(currVarName)) {
-                currVar = VariableParser.createVariable(currToken, type, isFinal);
-            }
-            else {
-                throw new VariableDeclarationException(currVarName);
-            }
-            // At this point the variable name is declarable.
-            currVar = VariableParser.createVariable(currToken, type, isFinal);
-
-            
-            tokenAfterName = tokenIterator.next();  // current token is either "=" or null.
-            if (tokenAfterName.equals("=")) {
-                currVar.initialize();
-            }
-            assignee = tokenIterator.next();  // Current token is an assigned value or null.
+        catch (SyntaxException | UnfamiliarVariableTypeException | InvalidAssignmentException
+                | UninitializedVariableUsageException e) {
+            throw new InvalidVariableDeclarationException(e.getMessage(), e);
         }
     }
 
-    /**
-     * @param line
-     * @return
-     */
-    private Variable[] parseVariableDec(String line) {
-        return null;
-    }
-        //todo
-
-    void verifyScope(){
+    protected void verifyScope(){
         Pattern begLinePattern = Pattern.compile(METHOD_CALL_REGEX);
         Pattern endLinePattern = Pattern.compile(METHODS_SECOND_PART_REGEX);
-        for (LineNode son : root.sons) {
-            String openingLine = son.data;
+        for (LineNode son : root.getSons()) {
+            String openingLine = son.getData();
             Matcher begLineMatcher = begLinePattern.matcher(openingLine);
             Matcher endLineMatcher = endLinePattern.matcher(openingLine);
             if(openingLine.endsWith(OPEN_BRACKET))
@@ -195,7 +213,7 @@ public abstract class Scope {
         }
     }
 
-    void methodCallVerify(Scope callingScope, String line){
+    protected void methodCallVerify(Scope callingScope, String line){
 
     }
 }

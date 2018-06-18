@@ -1,9 +1,13 @@
-package oop.ex6.main;
+package oop.ex6.scopes;
+
+import oop.ex6.main.ExceptionFileFormat;
+import oop.ex6.main.LineNode;
+import oop.ex6.variables.Variable;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MethodScope extends Scope{
+public class MethodScope extends Scope {
 
 
     private static final String METHODS_FIRST_PART_REGEX = "(void) " + METHOD_NAME_REGEX +" ?\\( ?";
@@ -17,7 +21,7 @@ public class MethodScope extends Scope{
 
     public MethodScope(LineNode root, Scope parent) throws ExceptionFileFormat {
         super(root, parent);
-        DecAnalyzer(root.data);
+        DecAnalyzer(root.getData());
     }
 
     private void DecAnalyzer(String deceleration) throws ExceptionFileFormat {

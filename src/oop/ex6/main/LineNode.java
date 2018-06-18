@@ -2,13 +2,12 @@ package oop.ex6.main;
 
 import java.util.ArrayList;
 
-class LineNode {
+public class LineNode {
 
-    ArrayList<LineNode> sons;
-
-    String data;
-    LineNode parent;
-    int lineNumber;
+    private ArrayList<LineNode> sons;
+    private String data;
+    private LineNode parent;
+    private int lineNumber;
 
 
     public LineNode(String dataLine, LineNode parent, int lineNumber)
@@ -16,6 +15,7 @@ class LineNode {
         data = dataLine;
         this.parent = parent;
         this.lineNumber = lineNumber;
+        sons = new ArrayList<>();
     }
 
     public void addSon(LineNode newSon){
@@ -26,6 +26,15 @@ class LineNode {
         return data;
     }
 
+    public ArrayList<LineNode> getSons() {
+        return sons;
+    }
 
+    public int getLineNumber() {
+        return lineNumber;
+    }
 
+    public LineNode getParent() {
+        return parent;
+    }
 }

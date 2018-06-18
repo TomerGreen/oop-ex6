@@ -18,13 +18,17 @@ public class LineTree {
     private final static String BEG_OF_SCOPE_REGEX = "( ?\\{)";
     private final static String END_OF_SCOPE_REGEX = "(\\})";
 
-    LineNode root;
+    private LineNode root;
 
     private static int lineNumber;
 
     public LineTree(BufferedReader br) throws IOException, ExceptionFileFormat {
         lineNumber = 0;
         root = parser(br, new LineNode(ROOT_LINE, null, lineNumber));
+    }
+
+    public LineNode getRoot() {
+        return root;
     }
 
     /**
@@ -48,8 +52,8 @@ public class LineTree {
                 else if(begOfScopeMatcher.find()) {
                     currRoot.addSon(parser(br, new LineNode(line, currRoot, lineNumber)));
                 }
-                else if(line.matches(END_OF_SCOPE_REGEX) && currRoot.parent != null)
-                    currRoot = currRoot.parent;
+                else if(line.matches(END_OF_SCOPE_REGEX) && currRoot.getParent() != null)
+                    currRoot = currRoot.getParent();
                 else
                     throw new ExceptionFileFormat();
             }

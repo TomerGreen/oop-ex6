@@ -1,4 +1,6 @@
-package oop.ex6.main;
+package oop.ex6.variables;
+
+import oop.ex6.variables.Variable;
 
 /**
  * Represents a char variable.

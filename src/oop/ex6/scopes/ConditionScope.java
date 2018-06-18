@@ -1,17 +1,17 @@
-package oop.ex6.main;
+package oop.ex6.scopes;
+
+import oop.ex6.main.LineNode;
 
 public class ConditionScope extends Scope {
 
-    ConditionScope(LineNode root, Scope parent){
+    public ConditionScope(LineNode root, Scope parent){
         super(root, parent);
         DecVerifier();
         verifyScope();
     }
 
     private void DecVerifier(){
-        String line = root.data;
-
+        String line = root.getData();
     }
-
-
+    
 }
