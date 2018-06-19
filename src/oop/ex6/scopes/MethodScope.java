@@ -6,6 +6,7 @@ import oop.ex6.main.LineNode;
 import oop.ex6.main.UninitializedVariableUsageException;
 import oop.ex6.variables.Variable;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,7 +23,7 @@ public class MethodScope extends Scope {
 
     String name;
 
-    Variable[] argList;
+    ArrayList<Variable> parameterList;
 
     public MethodScope(LineNode root, Scope parent, GlobalScope globalScope) throws ExceptionFileFormat {
         super(root, parent, globalScope);
@@ -37,26 +38,26 @@ public class MethodScope extends Scope {
         String tempName = methodDecelerationMatcher.group(NAME_PLC);
         if(global.getMethods().containsKey(tempName))
             throw new ExceptionFileFormat( ILLEGAL_METHOD_NAME);
-//        argList = getArgsList(methodDecelerationMatcher.group(ARGS_PLC)); // todo check which method to call
+        parameterList = getParameterList(methodDecelerationMatcher.group(ARGS_PLC)); // todo check which method to call
     }
 
 
     // todo send to method of variable class or finish writing this method
 //    private ArrayList<Variable> getArgsList(String argsDeclare){
-//        ArrayList<Variable> argList = new ArrayList<>();
+//        ArrayList<Variable> parameterList = new ArrayList<>();
 //        String[] args = argsDeclare.split(COMMA);
 //        for(String arg : args){
-//            //argList.add(VaribleFactory.analyzeVariable(arg)); // todo change to explicit method call
+//            //parameterList.add(VaribleFactory.analyzeVariable(arg)); // todo change to explicit method call
 //        }
-//        return argList;
+//        return parameterList;
 //    }
     void methodCallVerify(Scope callingScope, String parametersLine) throws IllegalMethodCallException,
             InvalidAssignmentException, UninitializedVariableUsageException {
         String[] parameters = parametersLine.split(COMMA);
-        if(parameters.length != argList.length)
+        if(parameters.length != parameterList.size())
             throw new IllegalMethodCallException();
-        for(int i = 0; i < argList.length ; i++){
-            callingScope.verifyValueAssignment(argList[i], parameters[i].trim());
+        for(int i = 0; i < parameterList.size() ; i++){
+            callingScope.verifyValueAssignment(parameterList.get(i), parameters[i].trim());
         }
 
     }

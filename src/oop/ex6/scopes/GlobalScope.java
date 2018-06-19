@@ -17,7 +17,7 @@ public class GlobalScope extends Scope {
 
     public GlobalScope(LineTree tree) throws ExceptionFileFormat, InvalidVariableDeclarationException,
             UnfamiliarMethodName, NoReturnException, IllegalMethodCallException,
-            UninitializedVariableUsageException, InvalidAssignmentException, UnfamiliarVariableTypeException {
+            UninitializedVariableUsageException, InvalidAssignmentException, UnrecognizedVariableTypeException {
         super(tree.getRoot(), null, null);
         methods = new HashMap<>();
         analyzeGlobalScope();
@@ -25,10 +25,10 @@ public class GlobalScope extends Scope {
     }
 
     private void analyzeGlobalScope() throws ExceptionFileFormat {
-        for (LineNode declerLine : root.getSons()) {
-            String line = declerLine.getData();
+        for (LineNode declareLine : root.getSons()) {
+            String line = declareLine.getData();
             if (line.startsWith(VOID))
-                new MethodScope(declerLine, null, this);
+                new MethodScope(declareLine, null, this);
             else {
                 //todo varAssignAnalyzer(line) and varDecAnalyzer(line) which update the var table
             }
@@ -37,7 +37,7 @@ public class GlobalScope extends Scope {
 
     private void verifyAllMethods() throws NoReturnException, InvalidVariableDeclarationException,
             UnfamiliarMethodName, InvalidAssignmentException, IllegalMethodCallException,
-            UninitializedVariableUsageException, UnfamiliarVariableTypeException {
+            UninitializedVariableUsageException, UnrecognizedVariableTypeException {
         for (Map.Entry<String, MethodScope> method: methods.entrySet()){
             MethodScope currMethod = method.getValue();
             ArrayList<LineNode> methodBody = currMethod.root.getSons();

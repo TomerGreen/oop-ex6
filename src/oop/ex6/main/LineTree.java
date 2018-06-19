@@ -38,20 +38,16 @@ public class LineTree {
     private LineNode parser(BufferedReader br, LineNode currRoot) throws IOException, ExceptionFileFormat {
         String line;
         line = getLine(br);
-//        Pattern begOfCommentPattern = Pattern.compile(COMMENT_PREFIX_REGEX);
         Pattern singleLinePattern = Pattern.compile(SINGLE_LINE_SUFFIX_REGEX);
         Pattern begOfScopePattern = Pattern.compile(BEG_OF_SCOPE_REGEX);
         while (line != null){
-//            Matcher begOfCommentMatcher = begOfCommentPattern.matcher(line);
-            Matcher singleLineMatcher = singleLinePattern.matcher(line); //todo think of transfer after the condition
-            Matcher begOfScopeMatcher = begOfScopePattern.matcher(line); //todo think of transfer after the condition
+            Matcher singleLineMatcher = singleLinePattern.matcher(line);
+            Matcher begOfScopeMatcher = begOfScopePattern.matcher(line);
             if(!(line.matches(EMPTY_LINE)|| line.startsWith(COMMENT_PREFIX_REGEX))){ // check that line isn't a comment or empty
-                if(singleLineMatcher.find()) {
+                if(singleLineMatcher.find())
                     currRoot.addSon(new LineNode(line, currRoot, lineNumber));
-                }
-                else if(begOfScopeMatcher.find()) {
+                else if(begOfScopeMatcher.find())
                     currRoot.addSon(parser(br, new LineNode(line, currRoot, lineNumber)));
-                }
                 else if(line.matches(END_OF_SCOPE_REGEX) && currRoot.getParent() != null)
                     currRoot = currRoot.getParent();
                 else
