@@ -40,8 +40,17 @@ public class MethodScope extends Scope {
 //        argList = getParameterList(methodDecelerationMatcher.group(ARGS_PLC)); // todo check which method to call
     }
 
-    private Variable[] getParameterList(String parameterList) throws InvalidParameterListException {
-        String currToken;  // The current token.
+    /**
+     * Returns a linked list of parameter variables based on a parameter list.
+     * @param parameterList The content of the method declaration parentheses.
+     * @return A linked list of parameter variables.
+     * @throws SyntaxException When the parameter list syntax is wrong.
+     * @throws InvalidParameterListException When the parameter list is invalid.
+     */
+    private LinkedList<Variable> getParameterList(String parameterList) throws SyntaxException,
+            InvalidParameterListException {
+        LinkedList<Variable> parameters = new LinkedList<>();
+        String finalMod;  // The current token.
         boolean isFinal;  // Whether the declared parameter is final.
         String type;  // The type name of the declared parameter.
         Variable currParam;  // The current variable object being parsed.
@@ -49,8 +58,8 @@ public class MethodScope extends Scope {
         try {
             Iterator<String> tokenIterator = VariableParser.getTokenizedParameterList(parameterList).iterator();
             while (tokenIterator.hasNext()) {
-                currToken = tokenIterator.next();  // A "final" modifier or null.
-                if (currToken.equals(FINAL)) {
+                finalMod = tokenIterator.next();  // A "final" modifier or null.
+                if (finalMod.equals(FINAL)) {
                     isFinal = true;
                 } else {
                     isFinal = false;
@@ -59,14 +68,20 @@ public class MethodScope extends Scope {
                 paramName = tokenIterator.next();  // A parameter name.
                 if (isVarnameDeclarable(paramName)) {
                     currParam = VariableParser.createVariable(paramName, type, isFinal);
-                } else {
-                    throw new InvalidVariableDeclarationException("Parameter name " + paramName + " is already declared.");
                 }
+                else {
+                    throw new InvalidParameterListException("Parameter name "
+                            + paramName + " is already declared.");
+                }
+                currParam.initialize();  // A parameter variable is always initialized (assignable in method scope).
+                addLocalVariable(currParam);
+                parameters.add(currParam);
             }
         }
-        catch (SyntaxException e) {
+        catch (UnrecognizedVariableTypeException e) {
             throw new InvalidParameterListException(e.getMessage(), e);
         }
+        return parameters;
     }
 
 

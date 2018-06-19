@@ -61,6 +61,14 @@ public abstract class Scope {
         return parent.getDefinedVariable(name);
     }
 
+    /**
+     * Adds a variable to the local symbol table.
+     * @param var The variable to be added.
+     */
+    protected void addLocalVariable(Variable var) {
+        variables.put(var.getName(), var);
+    }
+
     // TODO not sure if this method is necessary.
     /**
      * Returns whether the given variable name represents a defined and initialized variable.
@@ -192,7 +200,7 @@ public abstract class Scope {
                     throw new InvalidVariableDeclarationException("Variable '" + currVarName
                             + "' is declared final but is not initialized.");
                 }
-                variables.put(currVarName, currVar);
+                addLocalVariable(currVar);
             }
         }
         catch (SyntaxException | UnrecognizedVariableTypeException | InvalidAssignmentException
