@@ -146,13 +146,14 @@ public abstract class Scope {
     }
     */
 
+    // TODO shouldn't be public.
     /**
      * Receives a potentially valid variable declaration line, and creates the appropriate variables in the
      * scope's symbol table.
      * @param varDecLine The variable declaration line.
      * @throws InvalidVariableDeclarationException When anything is wrong in the declaration.
      */
-    protected void parseVarDeclaration(String varDecLine) throws InvalidVariableDeclarationException {
+    public void parseVarDeclaration(String varDecLine) throws InvalidVariableDeclarationException {
         String currToken;  // The current token.
         boolean isFinal = false;  // Whether the declared variables are final.
         String type;  // The type name of the declared variables.
@@ -166,17 +167,18 @@ public abstract class Scope {
             }
             // next is type name.
             type = tokenIterator.next();
-            currToken = tokenIterator.next();  // Must be a var name.
-            while (currToken != null) {  // In each iteration the current token is either a var name or null.
+            while (tokenIterator.hasNext()) {  // In each iteration the current token is either a var name or null.
+                currToken = tokenIterator.next();  // Must be a var name.
                 currVarName = currToken;
                 if (isVarnameDeclarable(currVarName)) {
                     currVar = VariableParser.createVariable(currToken, type, isFinal);
                 } else {
-                    throw new InvalidVariableDeclarationException("Cannot override declared variable '" + currVarName + "'.");
+                    throw new InvalidVariableDeclarationException("Cannot override declared variable '"
+                            + currVarName + "'.");
                 }
                 // At this point the variable name is declarable.
                 currToken = tokenIterator.next();  // Current token is "=" or null.
-                if (currToken.equals("=")) {
+                if (currToken != null && currToken.equals("=")) {
                     currVar.initialize();  // Initializing at this point so we can assign to final vars without errors.
                     currToken = tokenIterator.next();  // Current token is an assigned value.
                     verifyValueAssignment(currVar, currToken);
@@ -190,10 +192,9 @@ public abstract class Scope {
                             + "' is declared final but is not initialized.");
                 }
                 variables.put(currVarName, currVar);
-                currToken = tokenIterator.next();
             }
         }
-        catch (SyntaxException | UnfamiliarVariableTypeException | InvalidAssignmentException
+        catch (SyntaxException | UnrecognizedVariableTypeException | InvalidAssignmentException
                 | UninitializedVariableUsageException e) {
             throw new InvalidVariableDeclarationException(e.getMessage(), e);
         }

@@ -24,5 +24,5 @@ public class ConditionScope extends Scope {
             verifyValueAssignment(dummy, singleCondition);
         }
     }
-    
+
 }

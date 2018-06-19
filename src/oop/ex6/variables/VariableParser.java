@@ -1,8 +1,7 @@
 package oop.ex6.variables;
 
 import oop.ex6.main.SyntaxException;
-import oop.ex6.main.UnfamiliarVariableTypeException;
-import oop.ex6.variables.*;
+import oop.ex6.main.UnrecognizedVariableTypeException;
 
 import java.util.LinkedList;
 import java.util.regex.*;
@@ -14,6 +13,7 @@ import java.util.regex.*;
  */
 public class VariableParser {
 
+    private static final String DECLARATION_SEPARATOR = ",";
     private static final String FINAL_VARIABLE_DECLARATION_PREFIX = "(?:(final) )?";
     private static final String VARIABLE_TYPES_REGEX = "((?:int)|(?:boolean)|(?:String)|(?:double)|(?:char)) ";
     // TODO: Consider following line instead (to minimize effort when creating new var type.
@@ -21,15 +21,26 @@ public class VariableParser {
     private static final String LEGAL_VAR_NAME_REGEX = "(_*[a-zA-z]\\w*)";
     // Note that this regex matches ANY string as assigned value, using reluctant quantifier.
     private static final String VARIABLE_ASSIGNMENT_REGEX = " ?(=) ?(.*?)";
-    // "a" or "a = 5"
-    private static final String VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT = LEGAL_VAR_NAME_REGEX + "(?:"
-            + VARIABLE_ASSIGNMENT_REGEX + ")?";
+    // "a" or "a=5" or " a = 5 "
+    private static final String VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT = " ?" + LEGAL_VAR_NAME_REGEX + "(?:"
+            + VARIABLE_ASSIGNMENT_REGEX + ")? ?";
+    // Matches an entire variable declaration line. Note that group(3) is the comma-separated
+    // list of variables names and possible assignments.
     private static final String VARIABLE_DECLARATION_REGEX = FINAL_VARIABLE_DECLARATION_PREFIX +
-            VARIABLE_TYPES_REGEX + "(?:" + VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT + " ?, ?)*"
-            + VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT + " ?;";
+            VARIABLE_TYPES_REGEX + "((?:" + VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT + ",)*"
+            + VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT + ");";
+    private static final String LEGAL_METHOD_PARAMETER = " ?" + VARIABLE_TYPES_REGEX + LEGAL_VAR_NAME_REGEX + " ?";
 
+    /**
+     * A factory method that creates a variable based on a declared type, name, and final modifier.
+     * @param varName The variable name.
+     * @param type The variable type.
+     * @param isFinal Whether it should be final.
+     * @return A variable object.
+     * @throws UnrecognizedVariableTypeException When the type name is unrecognized.
+     */
     public static Variable createVariable(String varName, String type, boolean isFinal)
-            throws UnfamiliarVariableTypeException {
+            throws UnrecognizedVariableTypeException {
         if (type.equals("boolean")) {
             return new BooleanVariable(varName, isFinal);
         }
@@ -46,7 +57,7 @@ public class VariableParser {
             return new StringVariable(varName, isFinal);
         }
         else {
-            throw new UnfamiliarVariableTypeException(type);
+            throw new UnrecognizedVariableTypeException(type);
         }
     }
 
@@ -61,6 +72,13 @@ public class VariableParser {
     }
 
     /**
+     * Checks if a line matches the variable declaration pattern.
+     * @param line The potentially var dec line.
+     * @return Whether it is a valid variable declaration.
+     */
+    public static boolean isLegalVarDec(String line) { return line.matches(VARIABLE_DECLARATION_REGEX);}
+
+    /**
      * Returns a linked list of variable declaration line elements.
      * These elements are captured in the variable declaration regex.
      * @param varDecLine A variable declaration line.
@@ -69,15 +87,52 @@ public class VariableParser {
      */
     public static LinkedList<String> getTokenizedVarDeclaration(String varDecLine) throws SyntaxException {
         LinkedList<String> tokens = new LinkedList<>();
-        Pattern varDecPattern = Pattern.compile(VARIABLE_DECLARATION_REGEX);
-        Matcher varDecMatcher = varDecPattern.matcher(varDecLine);
-        if (varDecMatcher.matches()) {
-            for (int i=1; i<=varDecMatcher.groupCount(); i++) {
-                tokens.add(varDecMatcher.group(i));
+        Pattern varDecLinePattern = Pattern.compile(VARIABLE_DECLARATION_REGEX);
+        Matcher varDecLineMatcher = varDecLinePattern.matcher(varDecLine);
+        Pattern varDecPattern = Pattern.compile(VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT);
+        Matcher varDecMatcher;
+        if (varDecLineMatcher.matches()) {
+            tokens.add(varDecLineMatcher.group(1)); // A "final" or null token.
+            tokens.add(varDecLineMatcher.group(2)); // A variable type.
+            // This is an array of individual var declarations.
+            String[] varDecs = varDecLineMatcher.group(3).split(DECLARATION_SEPARATOR);
+            for (String declaration : varDecs) {
+                varDecMatcher = varDecPattern.matcher(declaration);
+                if (varDecMatcher.matches()) {
+                    tokens.add(varDecMatcher.group(1));  // The var name.
+                    tokens.add(varDecMatcher.group(2));  // = or null.
+                    tokens.add(varDecMatcher.group(3));  // Assigned value or null.
+                }
+                else {
+                    throw new SyntaxException("Variable declaration \"" + declaration + "\" is invalid");
+                }
             }
         }
         else {
             throw new SyntaxException("Invalid variable declaration.");
+        }
+        return tokens;
+    }
+
+    /**
+     * Returns a linked list of variable types and names from a method parameter list.
+     * @param paramList The parameter list, contained in parentheses.
+     * @return A linked list of parameter types and variable names.
+     * @throws SyntaxException When the parameter list is not in the right format.
+     */
+    public static LinkedList<String> getTokenizedParameterList(String paramList) throws SyntaxException {
+        LinkedList<String> tokens = new LinkedList<>();
+        Pattern paramPattern = Pattern.compile(LEGAL_METHOD_PARAMETER);
+        String[] params = paramList.split(DECLARATION_SEPARATOR);
+        for (String param : params) {
+            Matcher paramMatcher = paramPattern.matcher(param);
+            if (paramMatcher.matches()) {
+                tokens.add(paramMatcher.group(1));  // The parameter type.
+                tokens.add(paramMatcher.group(2));  // The parameter name.
+            }
+            else {
+                throw new SyntaxException("Invalid parameter syntax \"" + param + "\".");
+            }
         }
         return tokens;
     }
