@@ -34,8 +34,6 @@ public abstract class Scope {
     /** The global statement this statement is a part of. */
     GlobalScope global;
 
-//    protected Scope(){}
-
     protected Scope(LineNode root, Scope parent, GlobalScope global){
         this.global = global;
         this.root = root;
@@ -210,7 +208,8 @@ public abstract class Scope {
     }
 
     protected void verifyScope() throws UnfamiliarMethodName, InvalidVariableDeclarationException,
-            InvalidAssignmentException, IllegalMethodCallException, UninitializedVariableUsageException {
+            InvalidAssignmentException, IllegalMethodCallException, UninitializedVariableUsageException,
+            UnrecognizedVariableTypeException {
         Pattern conditionScopeDecPattern = Pattern.compile(CONDITION_SCOPE_DEC_REGEX);
         Pattern methodCallPattern = Pattern.compile(METHOD_CALL_REGEX);
         for (LineNode son : root.getSons()) {

@@ -10,14 +10,14 @@ public class ConditionScope extends Scope {
 
     public ConditionScope(LineNode root, Scope parent, String booleanCondition, GlobalScope globalScope) throws
             InvalidVariableDeclarationException, UnfamiliarMethodName, InvalidAssignmentException,
-            IllegalMethodCallException, UninitializedVariableUsageException, UnfamiliarVariableTypeException {
+            IllegalMethodCallException, UninitializedVariableUsageException, UnrecognizedVariableTypeException {
         super(root, parent, globalScope);
         booleanConditionVerifier(booleanCondition);
         verifyScope();
     }
 
-    private void booleanConditionVerifier(String conditionLine) throws UnfamiliarVariableTypeException,
-            InvalidAssignmentException, UninitializedVariableUsageException {
+    private void booleanConditionVerifier(String conditionLine) throws
+            InvalidAssignmentException, UninitializedVariableUsageException, UnrecognizedVariableTypeException {
         Variable dummy = VariableParser.createVariable("dummy", "boolean", false );
         String[] conditions = conditionLine.split(AND_OR_REGEX);
         for (String singleCondition : conditions) {
