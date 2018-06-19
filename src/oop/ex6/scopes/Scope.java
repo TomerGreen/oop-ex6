@@ -2,6 +2,7 @@ package oop.ex6.scopes;
 
 import oop.ex6.main.*;
 import oop.ex6.variables.Variable;
+import oop.ex6.variables.VariableAssignment;
 import oop.ex6.variables.VariableParser;
 import oop.ex6.main.UnfamiliarMethodName;
 
@@ -150,22 +151,6 @@ public abstract class Scope {
         }
     }
 
-    // TODO consider this method.
-    /*
-     * Initializes a variable if the assignment is valid.
-     * @param var The variable to initialize
-     * @param value The assigned value.
-     * @throws UnknownVariableException If the assigned value is an undefined varname.
-     * @throws InvalidAssignmentException If the assignment is otherwise invalid.
-
-    private void assignValue(Variable var, String value) throws InvalidAssignmentException,
-            UninitializedVariableUsageException, UnknownVariableException {
-        if (isValidAssignment(var, value)) {
-            var.initialize();
-        }
-    }
-    */
-
     // TODO shouldn't be public.
 
     /**
@@ -221,7 +206,21 @@ public abstract class Scope {
         }
     }
 
-    protected void verifyScope() throws InvalidVariableDeclarationException, ScopeException {
+    /**
+     * Checks if an assignment line is valid.
+     * @param assignLine The potential assignment line to be parsed.
+     * @throws SyntaxException If the line is malformed.
+     * @throws UnknownVariableException If the target variable name is not declared.
+     * @throws InvalidAssignmentException If the assignment is wrong for any other reason.
+     * @throws UninitializedVariableUsageException If the assigned value is a variable name of an uninitialized.
+     */
+    protected void parseAssignment(String assignLine) throws SyntaxException, UnknownVariableException,
+            InvalidAssignmentException, UninitializedVariableUsageException {
+        VariableAssignment assignment = VariableParser.getAssignment(assignLine);
+        Variable target = getDefinedVariable(assignment.getTarget());
+        verifyValueAssignment(target, assignment.getValue());
+    }
+    protected void verifyScope() throws InvalidVariableDeclarationException, ScopeException{
         Pattern conditionScopeDecPattern = Pattern.compile(CONDITION_SCOPE_DEC_REGEX);
         Pattern methodCallPattern = Pattern.compile(METHOD_CALL_REGEX);
         try {
@@ -250,9 +249,9 @@ public abstract class Scope {
                 }
             }
         } catch (UnrecognizedVariableTypeException | InvalidAssignmentException
-                | UninitializedVariableUsageException e) {
+                | UninitializedVariableUsageException|SyntaxException | UnknownVariableException  e) {
             throw new InvalidVariableDeclarationException(e.getMessage(), e);
-        }catch (ExceptionFileFormat | IllegalMethodCallException | UnfamiliarMethodName e){
+        }catch (IllegalMethodCallException | UnfamiliarMethodName e){
             throw new ScopeException(e.getMessage(), e);
         }
 
