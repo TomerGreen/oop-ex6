@@ -1,9 +1,11 @@
 package oop.ex6.scopes;
 
-import oop.ex6.main.ExceptionFileFormat;
-import oop.ex6.main.LineNode;
+import oop.ex6.main.*;
 import oop.ex6.variables.Variable;
+import oop.ex6.variables.VariableParser;
 
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,7 +38,36 @@ public class MethodScope extends Scope {
         String tempName = methodDecelerationMatcher.group(NAME_PLC);
         if(global.getMethods().containsKey(tempName))
             throw new ExceptionFileFormat( ILLEGAL_METHOD_NAME);
-//        argList = getArgsList(methodDecelerationMatcher.group(ARGS_PLC)); // todo check which method to call
+//        argList = getParameterList(methodDecelerationMatcher.group(ARGS_PLC)); // todo check which method to call
+    }
+
+    private Variable[] getParameterList(String parameterList) throws InvalidParameterListException {
+        String currToken;  // The current token.
+        boolean isFinal;  // Whether the declared parameter is final.
+        String type;  // The type name of the declared parameter.
+        Variable currParam;  // The current variable object being parsed.
+        String paramName;  // The name of the current variable being parsed.
+        try {
+            Iterator<String> tokenIterator = VariableParser.getTokenizedParameterList(parameterList).iterator();
+            while (tokenIterator.hasNext()) {
+                currToken = tokenIterator.next();  // A "final" modifier or null.
+                if (currToken.equals(FINAL)) {
+                    isFinal = true;
+                } else {
+                    isFinal = false;
+                }
+                type = tokenIterator.next();  // A variable type.
+                paramName = tokenIterator.next();  // A parameter name.
+                if (isVarnameDeclarable(paramName)) {
+                    currParam = VariableParser.createVariable(paramName, type, isFinal);
+                } else {
+                    throw new InvalidVariableDeclarationException("Parameter name " + paramName + " is already declared.");
+                }
+            }
+        }
+        catch (SyntaxException e) {
+            throw new InvalidParameterListException(e.getMessage(), e);
+        }
     }
 
 
@@ -50,7 +81,6 @@ public class MethodScope extends Scope {
 //        return argList;
 //    }
     void methodCallVerify(Scope callingScope, String args){
-
     }
 
 

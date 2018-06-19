@@ -14,6 +14,7 @@ public abstract class Scope {
     
     ////////////////////////////////////CONSTANTS////////////////////////////;
     protected static final String RETURN = "return";
+    protected static final String FINAL = "final";
     protected static final String METHOD_NAME_REGEX = "([a-zA-z]+\\w*)";
     protected static final String CONDITION_TYPES_REGEX = "(?:while)|(?:if)";
     protected static final String BRACKETS_CONTENTS = " ?\\((.*?)\\) ?";
@@ -162,7 +163,7 @@ public abstract class Scope {
         try {
             Iterator<String> tokenIterator = VariableParser.getTokenizedVarDeclaration(varDecLine).iterator();
             currToken = tokenIterator.next();  // Either final or null.
-            if (currToken != null && currToken.equals("final")) {
+            if (currToken != null && currToken.equals(FINAL)) {
                 isFinal = true;
             }
             // next is type name.
