@@ -11,8 +11,6 @@ public class GlobalScope extends Scope {
     ///////////////////////CONSTANTS////////////////////////
 
     private static final String VOID = "void";
-
-    private static final String COMMA = ",";
     private static final String NO_RETURN_EXCEPTION = "NoReturnException";
 
     private HashMap<String, MethodScope> methods;

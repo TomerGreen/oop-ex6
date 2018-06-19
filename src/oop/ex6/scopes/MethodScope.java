@@ -10,10 +10,14 @@ import java.util.regex.Pattern;
 public class MethodScope extends Scope {
 
 
-    private static final String METHODS_FIRST_PART_REGEX = "(void) " + METHOD_NAME_REGEX +" ?\\( ?";
-
+    //todo change to whole deceleration
+//    private static final String OPEN_BRACKET_REGEX = "\\) ?\\{";
+//    private static final String METHODS_FIRST_PART_REGEX = "(void) " + METHOD_NAME_REGEX +" ?\\( ?";
+    private static final String METHOD_DECELERATION_REGEX = "void "+ METHOD_NAME_REGEX + BRACKETS_CONTENTS + " ?\\{";
     private static final String ILLEGAL_METHOD_DECELERATION = "illegal method deceleration";
-    private static final int NAME_PLC = 1;
+    private static final String ILLEGAL_METHOD_NAME = "method name already used";
+    private static final int NAME_PLC = 0;
+    private static final int ARGS_PLC = 1;
 
     String name;
 
@@ -25,18 +29,14 @@ public class MethodScope extends Scope {
     }
 
     private void DecAnalyzer(String deceleration) throws ExceptionFileFormat {
-        Pattern begDeclarePattern = Pattern.compile(METHODS_FIRST_PART_REGEX);
-        Pattern endDeclarePattern = Pattern.compile(OPEN_BRACKET_REGEX);
-        Matcher begDeclareMatcher = begDeclarePattern.matcher(deceleration);
-        if(!begDeclareMatcher.find())
+        Pattern methodDecelerationPattern = Pattern.compile(METHOD_DECELERATION_REGEX);
+        Matcher methodDecelerationMatcher = methodDecelerationPattern.matcher(deceleration);
+        if(!methodDecelerationMatcher.find())
             throw new ExceptionFileFormat( ILLEGAL_METHOD_DECELERATION);
-        name = begDeclareMatcher.group(NAME_PLC);
-        // todo check if returned index of method "end" includes last char
-        Matcher endDeclareMatcher = endDeclarePattern.matcher(deceleration);
-        if(!endDeclareMatcher.find())
-            throw new ExceptionFileFormat( ILLEGAL_METHOD_DECELERATION);
-        String slicedDeceleration = deceleration.substring(begDeclareMatcher.end() + 1, endDeclareMatcher.start()); //remove the "name part" of line
-//        argList = getArgsList(slicedDeceleration); // todo check which method to call
+        String tempName = methodDecelerationMatcher.group(NAME_PLC);
+        if(global.getMethods().containsKey(tempName))
+            throw new ExceptionFileFormat( ILLEGAL_METHOD_NAME);
+//        argList = getArgsList(methodDecelerationMatcher.group(ARGS_PLC)); // todo check which method to call
     }
 
 
