@@ -21,7 +21,7 @@ public class VariableParser {
     private static final String LEGAL_VAR_NAME_REGEX = "(_*[a-zA-z]\\w*)";
     // Note that this regex matches ANY string as assigned value, using reluctant quantifier.
     private static final String ASSIGNMENT_WITHOUT_VAR_NAME = " ?(=) ?(.*?)";
-    private static final String VARIABLE_ASSIGNMENT_REGEX = LEGAL_VAR_NAME_REGEX + ASSIGNMENT_WITHOUT_VAR_NAME + " ?;";
+    private static final String LEGAL_VARIABLE_ASSIGNMENT = LEGAL_VAR_NAME_REGEX + ASSIGNMENT_WITHOUT_VAR_NAME + " ?;";
     // "a" or "a=5" or " a = 5 "
     private static final String VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT = " ?" + LEGAL_VAR_NAME_REGEX + "(?:"
             + ASSIGNMENT_WITHOUT_VAR_NAME + ")? ?";
@@ -85,7 +85,7 @@ public class VariableParser {
      * @param line The potential variable assignment line.
      * @return Whether it is a legal variable assignment.
      */
-    public static boolean isLegalAssignment(String line) { return line.matches(VARIABLE_ASSIGNMENT_REGEX); }
+    public static boolean isLegalAssignment(String line) { return line.matches(LEGAL_VARIABLE_ASSIGNMENT); }
 
     /**
      * Returns a linked list of variable declaration line elements.
@@ -141,10 +141,31 @@ public class VariableParser {
                 tokens.add(paramMatcher.group(3));  // The parameter name.
             }
             else {
-                throw new SyntaxException("Invalid parameter syntax \"" + param + "\".");
+                throw new SyntaxException("Illegal parameter syntax \"" + param + "\".");
             }
         }
         return tokens;
+    }
+
+    /**
+     * Parses an assignment line into an assignment object.
+     * @param line The potential assignment line.
+     * @return An array of two tokens.
+     * @throws SyntaxException When the assignment line is malformed.
+     */
+    public static VariableAssignment getAssignment(String line) throws SyntaxException {
+        final int ASSIGNEE_GROUP = 1;
+        final int VALUE_GROUP = 3;
+        VariableAssignment assignment;
+        Pattern assignPattern = Pattern.compile(LEGAL_VARIABLE_ASSIGNMENT);
+        Matcher assignMatcher = assignPattern.matcher(line);
+        if (assignMatcher.matches()) {
+            assignment = new VariableAssignment(assignMatcher.group(ASSIGNEE_GROUP), assignMatcher.group(VALUE_GROUP));
+        }
+        else {
+            throw new SyntaxException("Illegal assignment syntax \"" + line + "\"." );
+        }
+        return assignment;
     }
 
     /* todo - helper method for testing. Delete when submitting. */

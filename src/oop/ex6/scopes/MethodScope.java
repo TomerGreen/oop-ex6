@@ -105,5 +105,4 @@ public class MethodScope extends Scope {
         }
     }
 
-
 }
