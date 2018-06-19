@@ -13,5 +13,5 @@ public class ConditionScope extends Scope {
     private void DecVerifier(){
         String line = root.getData();
     }
-    
+
 }

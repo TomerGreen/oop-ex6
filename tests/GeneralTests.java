@@ -1,14 +1,19 @@
 import oop.ex6.main.ExceptionFileFormat;
+import oop.ex6.main.InvalidVariableDeclarationException;
 import oop.ex6.main.LineTree;
+import oop.ex6.scopes.ConditionScope;
 import oop.ex6.variables.VariableParser;
-import org.junit.*;
+import oop.ex6.main.LineNode;
 
+import org.junit.Test;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 import static jdk.nashorn.internal.objects.NativeString.trim;
 import static org.junit.Assert.*;
@@ -94,5 +99,56 @@ public class GeneralTests {
         BufferedReader br = new BufferedReader(new FileReader(sjava));
         //here we parse the text sjava file to tree of nested scopes
         LineTree parsedFile = new LineTree(br);
+    }
+
+    @Test
+    public void testVarDecParsing() {
+        LineNode dummyNode = new LineNode("while (blabla = 0) {", null, 1);
+        ConditionScope scope = new ConditionScope(dummyNode, null);
+
+        // ================= Valid lines =================
+
+        try {
+            scope.parseVarDeclaration("int a;");
+        }
+        catch (InvalidVariableDeclarationException e) {
+            fail();
+        }
+
+        try {
+            scope.parseVarDeclaration("int b, c, d;");
+        }
+        catch (InvalidVariableDeclarationException e) {
+            fail();
+        }
+
+        // // ================= Invalid lines =================
+
+        // Defining existing variable.
+        try {
+            scope.parseVarDeclaration("int a;");
+            fail();
+        }
+        catch (InvalidVariableDeclarationException e) {}
+        try {
+            scope.parseVarDeclaration("int y = '@'");
+            fail();
+        }
+        catch (InvalidVariableDeclarationException e) {}
+        try {
+            scope.parseVarDeclaration("int z, z;");
+            fail();
+        }
+        catch (InvalidVariableDeclarationException e) {}
+    }
+
+    @Test
+    public void checkHashMapMutability() {
+        HashMap<String, Integer> intMap = new HashMap<>();
+        Integer a = 5;
+        intMap.put("a", a);
+        assertTrue(intMap.get("a") == 5);
+        a = 7;
+        assertTrue(intMap.get("a") == 7);
     }
 }

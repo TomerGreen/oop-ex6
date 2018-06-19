@@ -36,7 +36,7 @@ public class MethodScope extends Scope {
         if(!endDeclareMatcher.find())
             throw new ExceptionFileFormat( ILLEGAL_METHOD_DECELERATION);
         String slicedDeceleration = deceleration.substring(begDeclareMatcher.end() + 1, endDeclareMatcher.start()); //remove the "name part" of line
-        argList = getArgsList(slicedDeceleration); // todo check which input the factory gets
+        //argList = getArgsList(slicedDeceleration); // todo check which input the factory gets
     }
 
 
