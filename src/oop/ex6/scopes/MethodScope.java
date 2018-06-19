@@ -5,7 +5,7 @@ import oop.ex6.variables.Variable;
 import oop.ex6.variables.VariableParser;
 
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,9 +47,9 @@ public class MethodScope extends Scope {
      * @throws SyntaxException When the parameter list syntax is wrong.
      * @throws InvalidParameterListException When the parameter list is invalid.
      */
-    private LinkedList<Variable> getParameterList(String parameterList) throws SyntaxException,
+    private ArrayList<Variable> getParameterList(String parameterList) throws SyntaxException,
             InvalidParameterListException {
-        LinkedList<Variable> parameters = new LinkedList<>();
+        ArrayList<Variable> parameters = new ArrayList<>();
         String finalMod;  // The current token.
         boolean isFinal;  // Whether the declared parameter is final.
         String type;  // The type name of the declared parameter.
