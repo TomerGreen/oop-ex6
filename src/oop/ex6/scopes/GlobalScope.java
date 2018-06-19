@@ -1,6 +1,7 @@
 package oop.ex6.scopes;
 
 import oop.ex6.main.*;
+import oop.ex6.variables.VariableParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,21 +22,26 @@ public class GlobalScope extends Scope {
             methods = new HashMap<>();
             analyzeGlobalScope();
             verifyAllMethods();
-        }catch (NoReturnException | ScopeException | InvalidVariableDeclarationException e){
+        }catch (NoReturnException | ScopeException | InvalidVariableDeclarationException | InvalidAssignmentException
+                | UninitializedVariableUsageException e){
             throw new GlobalScopeException(e.getMessage(), e);
+        } catch (UnknownVariableException e) {
+            e.printStackTrace();
         }
     }
 
-    private void analyzeGlobalScope() throws SyntaxException, InvalidParameterListException {
+    private void analyzeGlobalScope() throws SyntaxException, InvalidVariableDeclarationException,
+            UnknownVariableException, InvalidAssignmentException, UninitializedVariableUsageException {
         for (LineNode declareLine : root.getSons()) {
             String line = declareLine.getData();
             if (line.startsWith(VOID))
                 new MethodScope(declareLine, null, this);
-            else {
-                //todo varAssignAnalyzer(line) and varDecAnalyzer(line) which update the var table
+            else if (VariableParser.isLegalVarDec(line))
+                parseVarDeclaration(line);
+            else if (VariableParser.isLegalAssignment(line))
+                parseAssignment(line);
             }
         }
-    }
 
     private void verifyAllMethods() throws NoReturnException, InvalidVariableDeclarationException, ScopeException {
         for (Map.Entry<String, MethodScope> method: methods.entrySet()){
@@ -47,7 +53,7 @@ public class GlobalScope extends Scope {
         }
     }
 
-    public HashMap<String, MethodScope> getMethods() {
+    HashMap<String, MethodScope> getMethods() {
         return methods;
     }
 }

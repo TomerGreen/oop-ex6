@@ -1,9 +1,7 @@
-import oop.ex6.main.ExceptionFileFormat;
-import oop.ex6.main.InvalidVariableDeclarationException;
-import oop.ex6.main.LineTree;
+import oop.ex6.main.*;
 import oop.ex6.scopes.ConditionScope;
+import oop.ex6.scopes.ScopeException;
 import oop.ex6.variables.VariableParser;
-import oop.ex6.main.LineNode;
 
 import org.junit.Test;
 import java.io.BufferedReader;
@@ -102,9 +100,9 @@ public class GeneralTests {
     }
 
     @Test
-    public void testVarDecParsing() {
+    public void testVarDecParsing() throws UninitializedVariableUsageException, ScopeException, InvalidAssignmentException, InvalidVariableDeclarationException, UnrecognizedVariableTypeException {
         LineNode dummyNode = new LineNode("while (blabla = 0) {", null, 1);
-        ConditionScope scope = new ConditionScope(dummyNode, null);
+        ConditionScope scope = new ConditionScope(dummyNode, null, "blabla = 0", null);
 
         // ================= Valid lines =================
 
