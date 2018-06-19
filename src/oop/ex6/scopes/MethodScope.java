@@ -1,7 +1,9 @@
 package oop.ex6.scopes;
 
 import oop.ex6.main.ExceptionFileFormat;
+import oop.ex6.main.InvalidAssignmentException;
 import oop.ex6.main.LineNode;
+import oop.ex6.main.UninitializedVariableUsageException;
 import oop.ex6.variables.Variable;
 
 import java.util.regex.Matcher;
@@ -11,8 +13,7 @@ public class MethodScope extends Scope {
 
 
     //todo change to whole deceleration
-//    private static final String OPEN_BRACKET_REGEX = "\\) ?\\{";
-//    private static final String METHODS_FIRST_PART_REGEX = "(void) " + METHOD_NAME_REGEX +" ?\\( ?";
+    private static final String COMMA = ",";
     private static final String METHOD_DECELERATION_REGEX = "void "+ METHOD_NAME_REGEX + BRACKETS_CONTENTS + " ?\\{";
     private static final String ILLEGAL_METHOD_DECELERATION = "illegal method deceleration";
     private static final String ILLEGAL_METHOD_NAME = "method name already used";
@@ -49,7 +50,14 @@ public class MethodScope extends Scope {
 //        }
 //        return argList;
 //    }
-    void methodCallVerify(Scope callingScope, String args){
+    void methodCallVerify(Scope callingScope, String parametersLine) throws IllegalMethodCallException,
+            InvalidAssignmentException, UninitializedVariableUsageException {
+        String[] parameters = parametersLine.split(COMMA);
+        if(parameters.length != argList.length)
+            throw new IllegalMethodCallException();
+        for(int i = 0; i < argList.length ; i++){
+            callingScope.verifyValueAssignment(argList[i], parameters[i].trim());
+        }
 
     }
 
