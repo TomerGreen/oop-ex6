@@ -11,14 +11,12 @@ public class GlobalScope extends Scope {
     ///////////////////////CONSTANTS////////////////////////
 
     private static final String VOID = "void";
-
-    private static final String COMMA = ",";
     private static final String NO_RETURN_EXCEPTION = "NoReturnException";
 
     private HashMap<String, MethodScope> methods;
 
     public GlobalScope(LineTree tree) {
-        super(tree.getRoot(), null);
+        super(tree.getRoot(), null, null);
         methods = new HashMap<>();
 
     }
@@ -27,14 +25,14 @@ public class GlobalScope extends Scope {
         for (LineNode declerLine : root.getSons()) {
             String line = declerLine.getData();
             if (line.startsWith(VOID))
-                new MethodScope(declerLine, this);
+                new MethodScope(declerLine, this, this);
             else {
                 //todo varAssignAnalyzer(line) and varDecAnalyzer(line) which update the var table
             }
         }
     }
 
-    private void verifyAllMethods() throws NoReturnException {
+    private void verifyAllMethods() throws NoReturnException, InvalidVariableDeclarationException, UnfamiliarMethodName {
         for (Map.Entry<String, MethodScope> method: methods.entrySet()){
             MethodScope currMethod = method.getValue();
             ArrayList<LineNode> methodBody = currMethod.root.getSons();
@@ -42,5 +40,9 @@ public class GlobalScope extends Scope {
                 throw new NoReturnException(NO_RETURN_EXCEPTION);
             currMethod.verifyScope();
         }
+    }
+
+    public HashMap<String, MethodScope> getMethods() {
+        return methods;
     }
 }
