@@ -19,14 +19,14 @@ public class MethodScope extends Scope {
 
     Variable[] argList;
 
-    public MethodScope(LineNode root, Scope parent) throws ExceptionFileFormat {
-        super(root, parent);
+    public MethodScope(LineNode root, Scope parent, GlobalScope globalScope) throws ExceptionFileFormat {
+        super(root, parent, globalScope);
         DecAnalyzer(root.getData());
     }
 
     private void DecAnalyzer(String deceleration) throws ExceptionFileFormat {
         Pattern begDeclarePattern = Pattern.compile(METHODS_FIRST_PART_REGEX);
-        Pattern endDeclarePattern = Pattern.compile(METHODS_SECOND_PART_REGEX);
+        Pattern endDeclarePattern = Pattern.compile(OPEN_BRACKET_REGEX);
         Matcher begDeclareMatcher = begDeclarePattern.matcher(deceleration);
         if(!begDeclareMatcher.find())
             throw new ExceptionFileFormat( ILLEGAL_METHOD_DECELERATION);
@@ -36,7 +36,7 @@ public class MethodScope extends Scope {
         if(!endDeclareMatcher.find())
             throw new ExceptionFileFormat( ILLEGAL_METHOD_DECELERATION);
         String slicedDeceleration = deceleration.substring(begDeclareMatcher.end() + 1, endDeclareMatcher.start()); //remove the "name part" of line
-        argList = getArgsList(slicedDeceleration); // todo check which input the factory gets
+//        argList = getArgsList(slicedDeceleration); // todo check which method to call
     }
 
 
@@ -49,5 +49,9 @@ public class MethodScope extends Scope {
 //        }
 //        return argList;
 //    }
+    void methodCallVerify(Scope callingScope, String args){
+
+    }
+
 
 }

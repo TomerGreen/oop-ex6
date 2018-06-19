@@ -3,6 +3,7 @@ package oop.ex6.scopes;
 import oop.ex6.main.*;
 import oop.ex6.variables.Variable;
 import oop.ex6.variables.VariableParser;
+import oop.ex6.main.UnfamiliarMethodName;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,12 +13,13 @@ import java.util.regex.Pattern;
 public abstract class Scope {
     
     ////////////////////////////////////CONSTANTS////////////////////////////;
-    private static final String OPEN_BRACKET = "{";
     protected static final String RETURN = "return";
     protected static final String METHOD_NAME_REGEX = "([a-zA-z]+\\w*)";
-    private static final String METHOD_CALL_REGEX = METHOD_NAME_REGEX + " ?\\(";
-    protected static final String METHODS_SECOND_PART_REGEX = "\\) ?\\{";
-    
+    protected static final String CONDITION_TYPES_REGEX = "(?:while)|(?:if)";
+    protected static final String BRACKETS_CONTENTS = " ?\\((.*?)\\) ?";
+    private static final String CONDITION_SCOPE_DEC_REGEX = CONDITION_TYPES_REGEX + BRACKETS_CONTENTS + "\\{";
+    private static final String METHOD_CALL_REGEX = METHOD_NAME_REGEX +  BRACKETS_CONTENTS + ";";
+
     /** The root of the line tree that represents this scope. */
     protected LineNode root;
 
@@ -30,9 +32,10 @@ public abstract class Scope {
     /** The global statement this statement is a part of. */
     GlobalScope global;
 
-    protected Scope(){}
+//    protected Scope(){}
 
-    protected Scope(LineNode root, Scope parent){
+    protected Scope(LineNode root, Scope parent, GlobalScope global){
+        this.global = global;
         this.root = root;
         this.parent = parent;
         variables = new HashMap<>();
@@ -196,24 +199,28 @@ public abstract class Scope {
         }
     }
 
-    protected void verifyScope(){
-        Pattern begLinePattern = Pattern.compile(METHOD_CALL_REGEX);
-        Pattern endLinePattern = Pattern.compile(METHODS_SECOND_PART_REGEX);
+    protected void verifyScope() throws UnfamiliarMethodName, InvalidVariableDeclarationException {
+        Pattern conditionScopeDecPattern = Pattern.compile(CONDITION_SCOPE_DEC_REGEX);
+        Pattern methodCallPattern = Pattern.compile(METHOD_CALL_REGEX);
         for (LineNode son : root.getSons()) {
             String openingLine = son.getData();
-            Matcher begLineMatcher = begLinePattern.matcher(openingLine);
-            Matcher endLineMatcher = endLinePattern.matcher(openingLine);
-            if(openingLine.endsWith(OPEN_BRACKET))
-                new ConditionScope(son, this);
-            else if(openingLine.matches(RETURN)){ } //important (end of method) return line are considered previously
-            else if(begLineMatcher.find() && endLineMatcher.find()){
-                methodCallVerify(this, openingLine);
+            Matcher methodCallMatcher = methodCallPattern.matcher(openingLine);
+            Matcher conditionScopeMatcher = conditionScopeDecPattern.matcher(openingLine);
+            if(conditionScopeMatcher.find()){
+                String conditionPart = conditionScopeMatcher.group(0);
+                new ConditionScope(son, this, conditionPart, global);
             }
-            //todo varAssignAnalyzer(line) and varDecAnalyzer(line) which update the var table
+            else if(openingLine.matches(RETURN)){ } //important (end of method) return line are considered previously
+            else if(methodCallMatcher.find()){
+                String methodName = methodCallMatcher.group(0);
+                String argsPart = methodCallMatcher.group(1);
+                if(global.getMethods().containsKey(methodName))
+                    global.getMethods().get(methodName).methodCallVerify(this, argsPart);
+                else{throw new UnfamiliarMethodName();}
+            }
+            //todo use other method :varAssignAnalyzer(line) and varDecAnalyzer(line) which update the var table
+            else {parseVarDeclaration(openingLine);}
         }
     }
 
-    protected void methodCallVerify(Scope callingScope, String line){
-
-    }
 }
