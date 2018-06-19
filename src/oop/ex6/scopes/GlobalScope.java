@@ -15,16 +15,18 @@ public class GlobalScope extends Scope {
 
     private HashMap<String, MethodScope> methods;
 
-    public GlobalScope(LineTree tree) throws ExceptionFileFormat, InvalidVariableDeclarationException,
-            UnfamiliarMethodName, NoReturnException, IllegalMethodCallException,
-            UninitializedVariableUsageException, InvalidAssignmentException, UnrecognizedVariableTypeException {
+    public GlobalScope(LineTree tree) throws SyntaxException, GlobalScopeException{
         super(tree.getRoot(), null, null);
-        methods = new HashMap<>();
-        analyzeGlobalScope();
-        verifyAllMethods();
+        try {
+            methods = new HashMap<>();
+            analyzeGlobalScope();
+            verifyAllMethods();
+        }catch (NoReturnException | ScopeException | InvalidVariableDeclarationException e){
+            throw new GlobalScopeException(e.getMessage(), e);
+        }
     }
 
-    private void analyzeGlobalScope() throws ExceptionFileFormat {
+    private void analyzeGlobalScope() throws SyntaxException, InvalidParameterListException {
         for (LineNode declareLine : root.getSons()) {
             String line = declareLine.getData();
             if (line.startsWith(VOID))
@@ -35,9 +37,7 @@ public class GlobalScope extends Scope {
         }
     }
 
-    private void verifyAllMethods() throws NoReturnException, InvalidVariableDeclarationException,
-            UnfamiliarMethodName, InvalidAssignmentException, IllegalMethodCallException,
-            UninitializedVariableUsageException, UnrecognizedVariableTypeException {
+    private void verifyAllMethods() throws NoReturnException, InvalidVariableDeclarationException, ScopeException {
         for (Map.Entry<String, MethodScope> method: methods.entrySet()){
             MethodScope currMethod = method.getValue();
             ArrayList<LineNode> methodBody = currMethod.root.getSons();

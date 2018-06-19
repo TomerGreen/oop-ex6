@@ -24,14 +24,13 @@ public class MethodScope extends Scope {
 
     ArrayList<Variable> parameterList;
 
-    public MethodScope(LineNode root, Scope parent, GlobalScope globalScope) throws ExceptionFileFormat,
-            SyntaxException, InvalidParameterListException {
+    public MethodScope(LineNode root, Scope parent, GlobalScope globalScope) throws SyntaxException,
+            InvalidParameterListException {
         super(root, parent, globalScope);
         DecAnalyzer(root.getData());
     }
 
-    private void DecAnalyzer(String deceleration) throws ExceptionFileFormat, SyntaxException,
-            InvalidParameterListException {
+    private void DecAnalyzer(String deceleration) throws  SyntaxException, InvalidParameterListException {
         Pattern methodDecelerationPattern = Pattern.compile(METHOD_DECELERATION_REGEX);
         Matcher methodDecelerationMatcher = methodDecelerationPattern.matcher(deceleration);
         if(!methodDecelerationMatcher.find())
@@ -86,17 +85,6 @@ public class MethodScope extends Scope {
         }
         return parameters;
     }
-
-
-    // todo send to method of variable class or finish writing this method
-//    private ArrayList<Variable> getArgsList(String argsDeclare){
-//        ArrayList<Variable> parameterList = new ArrayList<>();
-//        String[] args = argsDeclare.split(COMMA);
-//        for(String arg : args){
-//            //parameterList.add(VaribleFactory.analyzeVariable(arg)); // todo change to explicit method call
-//        }
-//        return parameterList;
-//    }
 
     void methodCallVerify(Scope callingScope, String parametersLine) throws IllegalMethodCallException,
             InvalidAssignmentException, UninitializedVariableUsageException {
