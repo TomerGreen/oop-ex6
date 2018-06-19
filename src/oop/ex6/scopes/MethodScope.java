@@ -1,11 +1,10 @@
 package oop.ex6.scopes;
 
-import oop.ex6.main.ExceptionFileFormat;
-import oop.ex6.main.InvalidAssignmentException;
-import oop.ex6.main.LineNode;
-import oop.ex6.main.UninitializedVariableUsageException;
+import oop.ex6.main.*;
 import oop.ex6.variables.Variable;
+import oop.ex6.variables.VariableParser;
 
+import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,12 +24,14 @@ public class MethodScope extends Scope {
 
     ArrayList<Variable> parameterList;
 
-    public MethodScope(LineNode root, Scope parent, GlobalScope globalScope) throws ExceptionFileFormat {
+    public MethodScope(LineNode root, Scope parent, GlobalScope globalScope) throws ExceptionFileFormat,
+            SyntaxException, InvalidParameterListException {
         super(root, parent, globalScope);
         DecAnalyzer(root.getData());
     }
 
-    private void DecAnalyzer(String deceleration) throws ExceptionFileFormat {
+    private void DecAnalyzer(String deceleration) throws ExceptionFileFormat, SyntaxException,
+            InvalidParameterListException {
         Pattern methodDecelerationPattern = Pattern.compile(METHOD_DECELERATION_REGEX);
         Matcher methodDecelerationMatcher = methodDecelerationPattern.matcher(deceleration);
         if(!methodDecelerationMatcher.find())
@@ -39,6 +40,51 @@ public class MethodScope extends Scope {
         if(global.getMethods().containsKey(tempName))
             throw new ExceptionFileFormat( ILLEGAL_METHOD_NAME);
         parameterList = getParameterList(methodDecelerationMatcher.group(ARGS_PLC)); // todo check which method to call
+
+    }
+
+    /**
+     * Returns a linked list of parameter variables based on a parameter list.
+     * @param parameterList The content of the method declaration parentheses.
+     * @return A linked list of parameter variables.
+     * @throws SyntaxException When the parameter list syntax is wrong.
+     * @throws InvalidParameterListException When the parameter list is invalid.
+     */
+    private ArrayList<Variable> getParameterList(String parameterList) throws SyntaxException,
+            InvalidParameterListException {
+        ArrayList<Variable> parameters = new ArrayList<>();
+        String finalMod;  // The current token.
+        boolean isFinal;  // Whether the declared parameter is final.
+        String type;  // The type name of the declared parameter.
+        Variable currParam;  // The current variable object being parsed.
+        String paramName;  // The name of the current variable being parsed.
+        try {
+            Iterator<String> tokenIterator = VariableParser.getTokenizedParameterList(parameterList).iterator();
+            while (tokenIterator.hasNext()) {
+                finalMod = tokenIterator.next();  // A "final" modifier or null.
+                if (finalMod.equals(FINAL)) {
+                    isFinal = true;
+                } else {
+                    isFinal = false;
+                }
+                type = tokenIterator.next();  // A variable type.
+                paramName = tokenIterator.next();  // A parameter name.
+                if (isVarnameDeclarable(paramName)) {
+                    currParam = VariableParser.createVariable(paramName, type, isFinal);
+                }
+                else {
+                    throw new InvalidParameterListException("Parameter name "
+                            + paramName + " is already declared.");
+                }
+                currParam.initialize();  // A parameter variable is always initialized (assignable in method scope).
+                addLocalVariable(currParam);
+                parameters.add(currParam);
+            }
+        }
+        catch (UnrecognizedVariableTypeException e) {
+            throw new InvalidParameterListException(e.getMessage(), e);
+        }
+        return parameters;
     }
 
 
@@ -51,6 +97,7 @@ public class MethodScope extends Scope {
 //        }
 //        return parameterList;
 //    }
+
     void methodCallVerify(Scope callingScope, String parametersLine) throws IllegalMethodCallException,
             InvalidAssignmentException, UninitializedVariableUsageException {
         String[] parameters = parametersLine.split(COMMA);
@@ -59,7 +106,6 @@ public class MethodScope extends Scope {
         for(int i = 0; i < parameterList.size() ; i++){
             callingScope.verifyValueAssignment(parameterList.get(i), parameters[i].trim());
         }
-
     }
 
 

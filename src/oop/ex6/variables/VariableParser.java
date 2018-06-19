@@ -20,16 +20,18 @@ public class VariableParser {
     //private static final String VARIABLE_TYPES_REGEX = "([a-zA-Z]+) ";
     private static final String LEGAL_VAR_NAME_REGEX = "(_*[a-zA-z]\\w*)";
     // Note that this regex matches ANY string as assigned value, using reluctant quantifier.
-    private static final String VARIABLE_ASSIGNMENT_REGEX = " ?(=) ?(.*?)";
+    private static final String ASSIGNMENT_WITHOUT_VAR_NAME = " ?(=) ?(.*?)";
+    private static final String VARIABLE_ASSIGNMENT_REGEX = LEGAL_VAR_NAME_REGEX + ASSIGNMENT_WITHOUT_VAR_NAME + " ?;";
     // "a" or "a=5" or " a = 5 "
     private static final String VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT = " ?" + LEGAL_VAR_NAME_REGEX + "(?:"
-            + VARIABLE_ASSIGNMENT_REGEX + ")? ?";
+            + ASSIGNMENT_WITHOUT_VAR_NAME + ")? ?";
     // Matches an entire variable declaration line. Note that group(3) is the comma-separated
     // list of variables names and possible assignments.
     private static final String VARIABLE_DECLARATION_REGEX = FINAL_VARIABLE_DECLARATION_PREFIX +
             VARIABLE_TYPES_REGEX + "((?:" + VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT + ",)*"
             + VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT + ");";
-    private static final String LEGAL_METHOD_PARAMETER = " ?" + VARIABLE_TYPES_REGEX + LEGAL_VAR_NAME_REGEX + " ?";
+    private static final String LEGAL_METHOD_PARAMETER = " ?" + FINAL_VARIABLE_DECLARATION_PREFIX
+            + VARIABLE_TYPES_REGEX + LEGAL_VAR_NAME_REGEX + " ?";
 
     /**
      * A factory method that creates a variable based on a declared type, name, and final modifier.
@@ -74,9 +76,16 @@ public class VariableParser {
     /**
      * Checks if a line matches the variable declaration pattern.
      * @param line The potentially var dec line.
-     * @return Whether it is a valid variable declaration.
+     * @return Whether it is a legal variable declaration.
      */
-    public static boolean isLegalVarDec(String line) { return line.matches(VARIABLE_DECLARATION_REGEX);}
+    public static boolean isLegalVarDec(String line) { return line.matches(VARIABLE_DECLARATION_REGEX); }
+
+    /**
+     * Checks if a line matches the variable assignment pattern.
+     * @param line The potential variable assignment line.
+     * @return Whether it is a legal variable assignment.
+     */
+    public static boolean isLegalAssignment(String line) { return line.matches(VARIABLE_ASSIGNMENT_REGEX); }
 
     /**
      * Returns a linked list of variable declaration line elements.
@@ -127,8 +136,9 @@ public class VariableParser {
         for (String param : params) {
             Matcher paramMatcher = paramPattern.matcher(param);
             if (paramMatcher.matches()) {
-                tokens.add(paramMatcher.group(1));  // The parameter type.
-                tokens.add(paramMatcher.group(2));  // The parameter name.
+                tokens.add(paramMatcher.group(1));  // "final" or null.
+                tokens.add(paramMatcher.group(2));  // The parameter type.
+                tokens.add(paramMatcher.group(3));  // The parameter name.
             }
             else {
                 throw new SyntaxException("Invalid parameter syntax \"" + param + "\".");

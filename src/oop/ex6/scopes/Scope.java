@@ -14,6 +14,7 @@ public abstract class Scope {
     
     ////////////////////////////////////CONSTANTS////////////////////////////;
     protected static final String RETURN = "return";
+    protected static final String FINAL = "final";
     protected static final String METHOD_NAME_REGEX = "([a-zA-z]+\\w*)";
     protected static final String CONDITION_TYPES_REGEX = "(?:while)|(?:if)";
     protected static final String BRACKETS_CONTENTS = " ?\\((.*?)\\) ?";
@@ -56,6 +57,14 @@ public abstract class Scope {
             throw new UnknownVariableException("Variable name \"" + name + "\" is undefined.");
         }
         return parent.getDefinedVariable(name);
+    }
+
+    /**
+     * Adds a variable to the local symbol table.
+     * @param var The variable to be added.
+     */
+    protected void addLocalVariable(Variable var) {
+        variables.put(var.getName(), var);
     }
 
     // TODO not sure if this method is necessary.
@@ -160,7 +169,7 @@ public abstract class Scope {
         try {
             Iterator<String> tokenIterator = VariableParser.getTokenizedVarDeclaration(varDecLine).iterator();
             currToken = tokenIterator.next();  // Either final or null.
-            if (currToken != null && currToken.equals("final")) {
+            if (currToken != null && currToken.equals(FINAL)) {
                 isFinal = true;
             }
             // next is type name.
@@ -189,7 +198,7 @@ public abstract class Scope {
                     throw new InvalidVariableDeclarationException("Variable '" + currVarName
                             + "' is declared final but is not initialized.");
                 }
-                variables.put(currVarName, currVar);
+                addLocalVariable(currVar);
             }
         }
         catch (SyntaxException | UnrecognizedVariableTypeException | InvalidAssignmentException
