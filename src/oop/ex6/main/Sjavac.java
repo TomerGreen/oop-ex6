@@ -29,6 +29,8 @@ public class Sjavac {
             LineTree parsedFile = new LineTree(br);
             //here we analyze all the relevant data in the main1 class scope (A.K.A global)
             GlobalScope gllobalTable = new GlobalScope(parsedFile);
+
+
             System.out.println(FILE_FORMAT_IS_OK);
 
             // todo send the root to global class statement constructor and receive Symbol tables

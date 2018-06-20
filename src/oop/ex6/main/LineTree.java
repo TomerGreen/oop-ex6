@@ -49,7 +49,7 @@ public class LineTree {
                 else if(begOfScopeMatcher.find())
                     currRoot.addSon(parser(br, new LineNode(line, currRoot, lineNumber)));
                 else if(line.matches(END_OF_SCOPE_REGEX) && currRoot.getParent() != null)
-                    currRoot = currRoot.getParent();
+                    return currRoot.getParent();
                 else
                     throw new ExceptionFileFormat();
             }
