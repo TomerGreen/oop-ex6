@@ -14,11 +14,11 @@ import java.util.regex.Pattern;
 public abstract class Scope {
 
     ////////////////////////////////////CONSTANTS////////////////////////////;
-    protected static final String RETURN = "return";
-    protected static final String FINAL = "final";
-    protected static final String METHOD_NAME_REGEX = "([a-zA-z]+\\w*)";
-    protected static final String CONDITION_TYPES_REGEX = "(?:while)|(?:if)";
-    protected static final String BRACKETS_CONTENTS = " ?\\((.*?)\\) ?";
+    static final String RETURN = "return";
+    static final String FINAL = "final";
+    static final String METHOD_NAME_REGEX = "([a-zA-z]+\\w*)";
+    private static final String CONDITION_TYPES_REGEX = "(?:while)|(?:if)";
+    static final String BRACKETS_CONTENTS = " ?\\((.*?)\\) ?";
     private static final String CONDITION_SCOPE_DEC_REGEX = CONDITION_TYPES_REGEX + BRACKETS_CONTENTS + "\\{";
     private static final String METHOD_CALL_REGEX = METHOD_NAME_REGEX + BRACKETS_CONTENTS + ";";
 
@@ -35,14 +35,14 @@ public abstract class Scope {
     /**
      * The statement whose scope encapsulates this statement.
      */
-    protected Scope parent;
+    private Scope parent;
 
     /**
      * The global statement this statement is a part of.
      */
     GlobalScope global;
 
-    protected Scope(LineNode root, Scope parent, GlobalScope global) {
+    Scope(LineNode root, Scope parent, GlobalScope global) {
         this.global = global;
         this.root = root;
         this.parent = parent;
