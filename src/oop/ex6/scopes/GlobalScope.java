@@ -40,7 +40,8 @@ public class GlobalScope extends Scope {
                 parseVarDeclaration(line);
             else if (VariableParser.isLegalAssignment(line))
                 parseAssignment(line);
-            }
+            else{ throw new  ExceptionFileFormat();}
+        }
         }
 
     private void verifyAllMethods() throws NoReturnException, InvalidVariableDeclarationException, ScopeException {
