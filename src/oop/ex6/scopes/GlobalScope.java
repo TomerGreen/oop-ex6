@@ -1,6 +1,7 @@
 package oop.ex6.scopes;
 
 import oop.ex6.main.*;
+import oop.ex6.variables.VariableParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,29 +16,34 @@ public class GlobalScope extends Scope {
 
     private HashMap<String, MethodScope> methods;
 
-    public GlobalScope(LineTree tree) throws ExceptionFileFormat, InvalidVariableDeclarationException,
-            UnfamiliarMethodName, NoReturnException, IllegalMethodCallException,
-            UninitializedVariableUsageException, InvalidAssignmentException, UnrecognizedVariableTypeException {
+    public GlobalScope(LineTree tree) throws SyntaxException, GlobalScopeException{
         super(tree.getRoot(), null, null);
-        methods = new HashMap<>();
-        analyzeGlobalScope();
-        verifyAllMethods();
+        try {
+            methods = new HashMap<>();
+            analyzeGlobalScope();
+            verifyAllMethods();
+        }catch (NoReturnException | ScopeException | InvalidVariableDeclarationException | InvalidAssignmentException
+                | UninitializedVariableUsageException e){
+            throw new GlobalScopeException(e.getMessage(), e);
+        } catch (UnknownVariableException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void analyzeGlobalScope() throws ExceptionFileFormat {
+    private void analyzeGlobalScope() throws SyntaxException, InvalidVariableDeclarationException,
+            UnknownVariableException, InvalidAssignmentException, UninitializedVariableUsageException {
         for (LineNode declareLine : root.getSons()) {
             String line = declareLine.getData();
             if (line.startsWith(VOID))
                 new MethodScope(declareLine, null, this);
-            else {
-                //todo varAssignAnalyzer(line) and varDecAnalyzer(line) which update the var table
+            else if (VariableParser.isLegalVarDec(line))
+                parseVarDeclaration(line);
+            else if (VariableParser.isLegalAssignment(line))
+                parseAssignment(line);
             }
         }
-    }
 
-    private void verifyAllMethods() throws NoReturnException, InvalidVariableDeclarationException,
-            UnfamiliarMethodName, InvalidAssignmentException, IllegalMethodCallException,
-            UninitializedVariableUsageException, UnrecognizedVariableTypeException {
+    private void verifyAllMethods() throws NoReturnException, InvalidVariableDeclarationException, ScopeException {
         for (Map.Entry<String, MethodScope> method: methods.entrySet()){
             MethodScope currMethod = method.getValue();
             ArrayList<LineNode> methodBody = currMethod.root.getSons();
@@ -47,7 +53,7 @@ public class GlobalScope extends Scope {
         }
     }
 
-    public HashMap<String, MethodScope> getMethods() {
+    HashMap<String, MethodScope> getMethods() {
         return methods;
     }
 }

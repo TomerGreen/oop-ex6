@@ -14,7 +14,7 @@ public class LineTree {
     private final static String COMMENT_PREFIX_REGEX = "(//)";
     private final static String EMPTY_LINE = "";
     private final static String ROOT_LINE = "class;";
-    private final static String SINGLE_LINE_SUFFIX_REGEX = " (\\;)";
+    private final static String SINGLE_LINE_SUFFIX_REGEX = ";";
     private final static String BEG_OF_SCOPE_REGEX = "( ?\\{)";
     private final static String END_OF_SCOPE_REGEX = "(\\})";
 
@@ -49,7 +49,7 @@ public class LineTree {
                 else if(begOfScopeMatcher.find())
                     currRoot.addSon(parser(br, new LineNode(line, currRoot, lineNumber)));
                 else if(line.matches(END_OF_SCOPE_REGEX) && currRoot.getParent() != null)
-                    currRoot = currRoot.getParent();
+                    return currRoot.getParent();
                 else
                     throw new ExceptionFileFormat();
             }
