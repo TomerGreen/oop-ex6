@@ -186,9 +186,9 @@ public abstract class Scope {
                 // At this point the variable name is declarable.
                 currToken = tokenIterator.next();  // Current token is "=" or null.
                 if (currToken != null && currToken.equals("=")) {
-                    currVar.initialize();  // Initializing at this point so we can assign to final vars without errors.
                     currToken = tokenIterator.next();  // Current token is an assigned value.
-                    verifyValueAssignment(currVar, currToken);
+                    verifyValueAssignment(currVar, currToken);  // At this point the declared variable is uninitialized.
+                    currVar.initialize();  // Initializing variable.
                 }
                 // No assignment. A null token is expected, but this is verified by regex.
                 else {
