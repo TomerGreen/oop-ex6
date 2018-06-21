@@ -205,6 +205,7 @@ public abstract class Scope {
         VariableAssignment assignment = VariableParser.getAssignment(assignLine);
         Variable target = getDefinedVariable(assignment.getTarget());
         verifyValueAssignment(target, assignment.getValue());
+        target.initialize();
     }
 
     protected void verifyScope() throws UnfamiliarMethodName, InvalidVariableDeclarationException,
