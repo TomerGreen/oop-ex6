@@ -219,6 +219,7 @@ public abstract class Scope {
         VariableAssignment assignment = VariableParser.getAssignment(assignLine);
         Variable target = getDefinedVariable(assignment.getTarget());
         verifyValueAssignment(target, assignment.getValue());
+        target.initialize();
     }
     protected void verifyScope() throws InvalidVariableDeclarationException, ScopeException{
         Pattern conditionScopeDecPattern = Pattern.compile(CONDITION_SCOPE_DEC_REGEX);
