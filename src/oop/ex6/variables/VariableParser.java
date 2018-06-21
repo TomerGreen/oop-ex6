@@ -32,6 +32,7 @@ public class VariableParser {
             + VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT + ");";
     private static final String LEGAL_METHOD_PARAMETER = " ?" + FINAL_VARIABLE_DECLARATION_PREFIX
             + VARIABLE_TYPES_REGEX + LEGAL_VAR_NAME_REGEX + " ?";
+    private static final String EMPTY_STRING = "";
 
     /**
      * A factory method that creates a variable based on a declared type, name, and final modifier.
@@ -134,14 +135,16 @@ public class VariableParser {
         Pattern paramPattern = Pattern.compile(LEGAL_METHOD_PARAMETER);
         String[] params = paramList.split(DECLARATION_SEPARATOR);
         for (String param : params) {
-            Matcher paramMatcher = paramPattern.matcher(param);
-            if (paramMatcher.matches()) {
-                tokens.add(paramMatcher.group(1));  // "final" or null.
-                tokens.add(paramMatcher.group(2));  // The parameter type.
-                tokens.add(paramMatcher.group(3));  // The parameter name.
-            }
-            else {
-                throw new SyntaxException("Illegal parameter syntax \"" + param + "\".");
+            if(!param.equals(EMPTY_STRING)){
+                Matcher paramMatcher = paramPattern.matcher(param);
+                if (paramMatcher.matches()) {
+                    tokens.add(paramMatcher.group(1));  // "final" or null.
+                    tokens.add(paramMatcher.group(2));  // The parameter type.
+                    tokens.add(paramMatcher.group(3));  // The parameter name.
+                }
+                else {
+                    throw new SyntaxException("Illegal parameter syntax \"" + param + "\".");
+                }
             }
         }
         return tokens;

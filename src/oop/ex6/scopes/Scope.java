@@ -22,6 +22,7 @@ public abstract class Scope {
     private static final String CONDITION_SCOPE_DEC_REGEX = CONDITION_TYPES_REGEX + BRACKETS_CONTENTS + "\\{";
     private static final String METHOD_CALL_REGEX = METHOD_NAME_REGEX + BRACKETS_CONTENTS + ";";
 
+
     /**
      * The root of the line tree that represents this scope.
      */

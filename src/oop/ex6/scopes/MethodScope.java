@@ -17,8 +17,8 @@ public class MethodScope extends Scope {
     private static final String METHOD_DECELERATION_REGEX = "void "+ METHOD_NAME_REGEX + BRACKETS_CONTENTS + " ?\\{";
     private static final String ILLEGAL_METHOD_DECELERATION = "illegal method deceleration";
     private static final String ILLEGAL_METHOD_NAME = "method name already used";
-    private static final int NAME_PLC = 0;
-    private static final int ARGS_PLC = 1;
+    private static final int NAME_PLC = 1;
+    private static final int ARGS_PLC = 2;
 
     String name;
 

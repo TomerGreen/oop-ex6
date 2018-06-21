@@ -11,7 +11,7 @@ import static jdk.nashorn.internal.objects.NativeString.trim; // todo better imp
 public class LineTree {
 
     ////////////////////////////////////////CONSTANTS////////////////////////////////////////////////////
-    private final static String COMMENT_PREFIX_REGEX = "(//)";
+    private final static String COMMENT_PREFIX_REGEX = "//";
     private final static String EMPTY_LINE = "";
     private final static String ROOT_LINE = "class;";
     private final static String SINGLE_LINE_SUFFIX_REGEX = ";";
@@ -41,17 +41,25 @@ public class LineTree {
         Pattern singleLinePattern = Pattern.compile(SINGLE_LINE_SUFFIX_REGEX);
         Pattern begOfScopePattern = Pattern.compile(BEG_OF_SCOPE_REGEX);
         while (line != null){
-            Matcher singleLineMatcher = singleLinePattern.matcher(line);
-            Matcher begOfScopeMatcher = begOfScopePattern.matcher(line);
-            if(!(line.matches(EMPTY_LINE)|| line.startsWith(COMMENT_PREFIX_REGEX))){ // check that line isn't a comment or empty
-                if(singleLineMatcher.find())
-                    currRoot.addSon(new LineNode(line, currRoot, lineNumber));
-                else if(begOfScopeMatcher.find())
-                    currRoot.addSon(parser(br, new LineNode(line, currRoot, lineNumber)));
-                else if(line.matches(END_OF_SCOPE_REGEX) && currRoot.getParent() != null)
-                    return currRoot.getParent();
-                else
-                    throw new ExceptionFileFormat();
+            // check that line isn't a comment or empty
+            if(!line.startsWith(COMMENT_PREFIX_REGEX)){
+                line = trim(line).replaceAll("\\s+"," ");
+                if(!line.matches(EMPTY_LINE)){
+                    Matcher singleLineMatcher = singleLinePattern.matcher(line);
+                    Matcher begOfScopeMatcher = begOfScopePattern.matcher(line);
+                    if(singleLineMatcher.find()) {
+                        currRoot.addSon(new LineNode(line, currRoot, lineNumber));
+                    }
+                    else if(begOfScopeMatcher.find()) {
+                        currRoot.addSon(parser(br, new LineNode(line, currRoot, lineNumber)));
+                    }
+                    else if(line.matches(END_OF_SCOPE_REGEX) && currRoot.getParent() != null) {
+                        return currRoot;
+                    }
+                    else {
+                        throw new ExceptionFileFormat();
+                    }
+                }
             }
             line = getLine(br);
         }
@@ -69,7 +77,7 @@ public class LineTree {
         if(line == null)
             return null;
         else
-            return trim(line).replaceAll("\\s+"," ");
+            return line;
     }
 
 }
