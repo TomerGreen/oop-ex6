@@ -9,7 +9,7 @@ public class DoubleVariable extends BooleanVariable {
 
     private static final String typeName = "double";
 
-    private static final String VALID_DOUBLE_VALUE = "-?\\d+(?:.\\d+)";
+    private static final String VALID_DOUBLE_VALUE = "-?\\d+(?:.\\d+)?";
 
     /**
      * Creates a double variable object.
