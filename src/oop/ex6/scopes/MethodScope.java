@@ -35,10 +35,12 @@ public class MethodScope extends Scope {
         Matcher methodDecelerationMatcher = methodDecelerationPattern.matcher(deceleration);
         if(!methodDecelerationMatcher.find())
             throw new ExceptionFileFormat( ILLEGAL_METHOD_DECELERATION);
-        String tempName = methodDecelerationMatcher.group(NAME_PLC);
-        if(global.getMethods().containsKey(tempName))
+        name = methodDecelerationMatcher.group(NAME_PLC);
+        if(global.getMethods().containsKey(name)) {
             throw new ExceptionFileFormat( ILLEGAL_METHOD_NAME);
-        parameterList = getParameterList(methodDecelerationMatcher.group(ARGS_PLC)); // todo check which method to call
+        }
+        parameterList = getParameterList(methodDecelerationMatcher.group(ARGS_PLC));
+        global.setMethods(name, this);
 
     }
 

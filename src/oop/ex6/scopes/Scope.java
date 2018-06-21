@@ -17,7 +17,7 @@ public abstract class Scope {
     static final String RETURN = "return";
     static final String FINAL = "final";
     static final String METHOD_NAME_REGEX = "([a-zA-z]+\\w*)";
-    private static final String CONDITION_TYPES_REGEX = "(?:while)|(?:if)";
+    private static final String CONDITION_TYPES_REGEX = "((?:while)|(?:if))";
     static final String BRACKETS_CONTENTS = " ?\\((.*?)\\) ?";
     private static final String CONDITION_SCOPE_DEC_REGEX = CONDITION_TYPES_REGEX + BRACKETS_CONTENTS + "\\{";
     private static final String METHOD_CALL_REGEX = METHOD_NAME_REGEX + BRACKETS_CONTENTS + ";";
@@ -230,9 +230,9 @@ public abstract class Scope {
                 Matcher methodCallMatcher = methodCallPattern.matcher(openingLine);
                 Matcher conditionScopeMatcher = conditionScopeDecPattern.matcher(openingLine);
                 if (conditionScopeMatcher.find()) {
-                    String conditionPart = conditionScopeMatcher.group(0);
+                    String conditionPart = conditionScopeMatcher.group(2);
                     new ConditionScope(son, this, conditionPart, global);
-                } else if (openingLine.matches(RETURN)) { } //method's last return line was considered previously
+                } else if (openingLine.startsWith(RETURN)) { } //method's last return line was considered previously
                 else if (methodCallMatcher.find()) {
                     String methodName = methodCallMatcher.group(0);
                     String argsPart = methodCallMatcher.group(1);

@@ -13,8 +13,7 @@ public class GlobalScope extends Scope {
 
     private static final String VOID = "void";
     private static final String NO_RETURN_EXCEPTION = "NoReturnException";
-
-    private HashMap<String, MethodScope> methods;
+    HashMap<String, MethodScope> methods;
 
     public GlobalScope(LineTree tree) throws SyntaxException, GlobalScopeException{
         super(tree.getRoot(), null, null);
@@ -48,10 +47,15 @@ public class GlobalScope extends Scope {
         for (Map.Entry<String, MethodScope> method: methods.entrySet()){
             MethodScope currMethod = method.getValue();
             ArrayList<LineNode> methodBody = currMethod.root.getSons();
-            if(!methodBody.get(methodBody.size() -1).getData().equals(RETURN))
+            String lastMethodLine = methodBody.get(methodBody.size() -1).getData();
+            if(!lastMethodLine.startsWith(RETURN))
                 throw new NoReturnException(NO_RETURN_EXCEPTION);
             currMethod.verifyScope();
         }
+    }
+
+    public void setMethods(String name, MethodScope methodScope){
+        methods.put(name, methodScope);
     }
 
     HashMap<String, MethodScope> getMethods() {
