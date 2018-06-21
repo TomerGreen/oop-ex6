@@ -18,7 +18,6 @@ public class Sjavac {
     private final static String ARGUMENTS_ERROR = "arguments error";
     private final static String FILE_FORMAT_ILLEGAL = "file format illegal";
 
-
     public static void main(String args[]){
         try {
             if (!(args.length == NUM_OF_PARAMETERS && args[0].endsWith(SJAVA_TYPE)))
@@ -41,6 +40,7 @@ public class Sjavac {
             System.out.println(PARAMETERS_ERROR);
         } catch (SyntaxException|GlobalScopeException e) {
             System.out.println(BAD_FORMAT_ERROR);
+            System.err.println(e.getMessage());
         }
 
     }

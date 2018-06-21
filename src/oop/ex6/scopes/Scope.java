@@ -116,9 +116,13 @@ public abstract class Scope {
         if (var.isFinal() && var.isInitialized()) {
             throw new InvalidAssignmentException("Cannot assign value to final variable after declaration.");
         }
-        // The assigned value is a variable.
+        // Checks if the value is a valid assignment of a primitive value.
+        else if (var.isValidValue(value)) {
+                return;
+            }
+        // Checks if the assigned value is a variable name of a usable variable.
         else if (VariableParser.isLegalVarName(value)) {
-            Variable assignee = null;  // Throws exception if assignee wasn't returned.
+            Variable assignee;  // Throws exception if assignee wasn't returned.
             try {
                 assignee = getDefinedVariable(value);
             } catch (UnknownVariableException e) {
@@ -140,14 +144,9 @@ public abstract class Scope {
                 throw new UninitializedVariableUsageException(assignee);
             }
         }
-        // The assigned value is primitive, i.e "hello" , '@' , 5. , 3.2 etc.
         else {
-            if (var.isValidValue(value)) {
-                return;
-            } else {
-                throw new InvalidAssignmentException("Cannot assign value " + value + " to variable of type "
-                        + var.getTypeName() + ".");
-            }
+            throw new InvalidAssignmentException("Cannot assign value " + value + " to variable of type "
+                    + var.getTypeName() + ".");
         }
     }
 

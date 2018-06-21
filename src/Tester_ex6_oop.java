@@ -74,7 +74,6 @@ public class Tester_ex6_oop {
 			System.out.println("user result:");
 			System.out.println(userPrints[0]); //prints
 			System.out.println(userPrints[1]); //errors
-
 		}
 
 
