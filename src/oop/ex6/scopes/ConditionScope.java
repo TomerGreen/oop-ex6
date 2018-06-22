@@ -21,7 +21,7 @@ public class ConditionScope extends Scope {
         Variable dummy = VariableParser.createVariable("dummy", "boolean", false );
         String[] conditions = conditionLine.split(AND_OR_REGEX);
         for (String singleCondition : conditions) {
-            verifyValueAssignment(dummy, singleCondition);
+            verifyValueAssignment(dummy, singleCondition.trim());
         }
     }
 

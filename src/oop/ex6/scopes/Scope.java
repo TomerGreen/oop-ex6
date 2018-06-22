@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 public abstract class Scope {
 
     ////////////////////////////////////CONSTANTS////////////////////////////;
-    static final String RETURN = "return";
+    static final String RETURN = "return ?;";
     static final String FINAL = "final";
     static final String METHOD_NAME_REGEX = "([a-zA-z]+\\w*)";
     private static final String CONDITION_TYPES_REGEX = "((?:while)|(?:if))";
@@ -65,7 +65,7 @@ public abstract class Scope {
             return variables.get(name);
         }
         if (parent == null) {
-            throw new UnknownVariableException("Variable name \"" + name + "\" is undefined.");
+            return global.getDefinedVariable(name);
         }
         return parent.getDefinedVariable(name);
     }
@@ -232,7 +232,7 @@ public abstract class Scope {
                 if (conditionScopeMatcher.find()) {
                     String conditionPart = conditionScopeMatcher.group(2);
                     new ConditionScope(son, this, conditionPart, global);
-                } else if (openingLine.startsWith(RETURN)) { } //method's last return line was considered previously
+                } else if(openingLine.matches(RETURN)) { } //method's last return line was considered previously
                 else if (methodCallMatcher.find()) {
                     String methodName = methodCallMatcher.group(0);
                     String argsPart = methodCallMatcher.group(1);

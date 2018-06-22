@@ -1,6 +1,7 @@
 package oop.ex6.scopes;
 
 import oop.ex6.main.*;
+import oop.ex6.variables.Variable;
 import oop.ex6.variables.VariableParser;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ public class GlobalScope extends Scope {
 
     private static final String VOID = "void";
     private static final String NO_RETURN_EXCEPTION = "NoReturnException";
+    private static final String GLOBAL_RETURN = "return line in global scope";
     HashMap<String, MethodScope> methods;
 
     public GlobalScope(LineTree tree) throws SyntaxException, GlobalScopeException{
@@ -31,26 +33,35 @@ public class GlobalScope extends Scope {
 
     private void analyzeGlobalScope() throws SyntaxException, InvalidVariableDeclarationException,
             UnknownVariableException, InvalidAssignmentException, UninitializedVariableUsageException {
-        for (LineNode declareLine : root.getSons()) {
-            String line = declareLine.getData();
-            if (line.startsWith(VOID))
-                new MethodScope(declareLine, null, this);
-            else if (VariableParser.isLegalVarDec(line))
-                parseVarDeclaration(line);
-            else if (VariableParser.isLegalAssignment(line))
-                parseAssignment(line);
-            else{ throw new  ExceptionFileFormat();}
+        if(root.getSons().size() !=0){
+            for (LineNode declareLine : root.getSons()) {
+                String line = declareLine.getData();
+                if(line.matches(RETURN))
+                    throw new ExceptionFileFormat(GLOBAL_RETURN);
+                else if (line.startsWith(VOID))
+                    new MethodScope(declareLine, null, this);
+                else if (VariableParser.isLegalVarDec(line))
+                    parseVarDeclaration(line);
+                else if (VariableParser.isLegalAssignment(line))
+                    parseAssignment(line);
+                else{ throw new  ExceptionFileFormat();}
+            }
         }
-        }
+    }
 
     private void verifyAllMethods() throws NoReturnException, InvalidVariableDeclarationException, ScopeException {
         for (Map.Entry<String, MethodScope> method: methods.entrySet()){
             MethodScope currMethod = method.getValue();
             ArrayList<LineNode> methodBody = currMethod.root.getSons();
-            String lastMethodLine = methodBody.get(methodBody.size() -1).getData();
-            if(!lastMethodLine.startsWith(RETURN))
+            int numOfMethodLines = methodBody.size();
+            if(numOfMethodLines > 0){
+                String lastMethodLine = methodBody.get(numOfMethodLines -1).getData();
+                if(!lastMethodLine.matches(RETURN))
+                    throw new NoReturnException(NO_RETURN_EXCEPTION);
+                currMethod.verifyScope();
+            }
+            else
                 throw new NoReturnException(NO_RETURN_EXCEPTION);
-            currMethod.verifyScope();
         }
     }
 
@@ -60,5 +71,14 @@ public class GlobalScope extends Scope {
 
     HashMap<String, MethodScope> getMethods() {
         return methods;
+    }
+
+    @Override
+    protected Variable getDefinedVariable(String name) throws UnknownVariableException {
+        if (this.variables.containsKey(name)) {
+            return variables.get(name);
+        }
+        else
+            throw new UnknownVariableException("Variable name \"" + name + "\" is undefined.");
     }
 }
