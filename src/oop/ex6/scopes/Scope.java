@@ -234,8 +234,8 @@ public abstract class Scope {
                     new ConditionScope(son, this, conditionPart, global);
                 } else if(openingLine.matches(RETURN)) { } //method's last return line was considered previously
                 else if (methodCallMatcher.find()) {
-                    String methodName = methodCallMatcher.group(0);
-                    String argsPart = methodCallMatcher.group(1);
+                    String methodName = methodCallMatcher.group(1);
+                    String argsPart = methodCallMatcher.group(2);
                     if (global.getMethods().containsKey(methodName))
                         global.getMethods().get(methodName).methodCallVerify(this, argsPart);
                     else {

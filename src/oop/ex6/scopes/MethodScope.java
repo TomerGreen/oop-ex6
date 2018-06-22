@@ -63,7 +63,7 @@ public class MethodScope extends Scope {
             Iterator<String> tokenIterator = VariableParser.getTokenizedParameterList(parameterList).iterator();
             while (tokenIterator.hasNext()) {
                 finalMod = tokenIterator.next();  // A "final" modifier or null.
-                if (finalMod.equals(FINAL)) {
+                if (finalMod != null && finalMod.equals(FINAL)) {
                     isFinal = true;
                 } else {
                     isFinal = false;
@@ -90,7 +90,11 @@ public class MethodScope extends Scope {
 
     void methodCallVerify(Scope callingScope, String parametersLine) throws IllegalMethodCallException,
             InvalidAssignmentException, UninitializedVariableUsageException {
-        String[] parameters = parametersLine.split(COMMA);
+        String[] parameters;
+        if(parametersLine.matches(" ?"))
+            parameters = new String[0];
+        else
+            parameters = parametersLine.split(COMMA);
         if(parameters.length != parameterList.size())
             throw new IllegalMethodCallException();
         for(int i = 0; i < parameterList.size() ; i++){
