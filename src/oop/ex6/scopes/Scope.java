@@ -233,7 +233,7 @@ public abstract class Scope {
                     String conditionPart = conditionScopeMatcher.group(2);
                     new ConditionScope(son, this, conditionPart, global);
                 } else if(openingLine.matches(RETURN)) { } //method's last return line was considered previously
-                else if (methodCallMatcher.find()) {
+                else if (methodCallMatcher.find() && methodCallMatcher.start() == 0) {
                     String methodName = methodCallMatcher.group(1);
                     String argsPart = methodCallMatcher.group(2);
                     if (global.getMethods().containsKey(methodName))
@@ -242,7 +242,7 @@ public abstract class Scope {
                         throw new UnfamiliarMethodName();
                     }
                 } else if (VariableParser.isLegalVarDec(openingLine))
-                    parseVarDeclaration(openingLine);
+                     parseVarDeclaration(openingLine);
                 else if (VariableParser.isLegalAssignment(openingLine))
                     parseAssignment(openingLine);
                 else {
