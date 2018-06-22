@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static jdk.nashorn.internal.objects.NativeString.trim; // todo better import
-
 
 public class LineTree {
 
@@ -43,7 +41,7 @@ public class LineTree {
         while (line != null){
             // check that line isn't a comment or empty
             if(!line.startsWith(COMMENT_PREFIX_REGEX)){
-                line = trim(line).replaceAll("\\s+"," ");
+                line = line.trim().replaceAll("\\s+"," ");
                 if(!line.matches(EMPTY_LINE)){
                     Matcher singleLineMatcher = singleLinePattern.matcher(line);
                     Matcher begOfScopeMatcher = begOfScopePattern.matcher(line);

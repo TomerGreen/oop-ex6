@@ -18,7 +18,7 @@ public class VariableParser {
     private static final String VARIABLE_TYPES_REGEX = "((?:int)|(?:boolean)|(?:String)|(?:double)|(?:char)) ";
     // TODO: Consider following line instead (to minimize effort when creating new var type.
     //private static final String VARIABLE_TYPES_REGEX = "([a-zA-Z]+) ";
-    private static final String LEGAL_VAR_NAME_REGEX = "(_*[a-zA-z]\\w*)";
+    private static final String LEGAL_VAR_NAME_REGEX = "(_*[a-zA-Z]\\w*)";
     // Note that this regex matches ANY string as assigned value, using reluctant quantifier.
     private static final String ASSIGNMENT_WITHOUT_VAR_NAME = " ?(=) ?(.*?)";
     private static final String LEGAL_VARIABLE_ASSIGNMENT = LEGAL_VAR_NAME_REGEX + ASSIGNMENT_WITHOUT_VAR_NAME + " ?;";

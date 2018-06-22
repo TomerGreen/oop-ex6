@@ -16,7 +16,7 @@ public abstract class Scope {
     ////////////////////////////////////CONSTANTS////////////////////////////;
     static final String RETURN = "return ?;";
     static final String FINAL = "final";
-    static final String METHOD_NAME_REGEX = "([a-zA-z]+\\w*)";
+    static final String METHOD_NAME_REGEX = "([a-zA-Z]+\\w*)";
     private static final String CONDITION_TYPES_REGEX = "((?:while)|(?:if))";
     static final String BRACKETS_CONTENTS = " ?\\((.*?)\\) ?";
     private static final String CONDITION_SCOPE_DEC_REGEX = CONDITION_TYPES_REGEX + BRACKETS_CONTENTS + "\\{";
