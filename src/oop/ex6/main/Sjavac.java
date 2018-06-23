@@ -19,7 +19,7 @@ public class Sjavac {
     public static void main(String args[]){
         try {
             if (!(args.length == NUM_OF_PARAMETERS && args[0].endsWith(SJAVA_TYPE)))
-                throw new ExceptionArgs(PARAMETERS_ERROR);
+                throw new IOException(PARAMETERS_ERROR);
             File SjavaFile = new File(args[0]);
             BufferedReader br = new BufferedReader(new FileReader(SjavaFile));
             //here we parse the text sjava file to tree of nested scopes

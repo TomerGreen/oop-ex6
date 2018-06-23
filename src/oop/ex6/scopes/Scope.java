@@ -4,7 +4,6 @@ import oop.ex6.main.*;
 import oop.ex6.variables.Variable;
 import oop.ex6.variables.VariableAssignment;
 import oop.ex6.variables.VariableParser;
-import oop.ex6.main.UnfamiliarMethodName;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -102,13 +101,12 @@ public abstract class Scope {
      *
      * @param var   The variable object to which we want to assign.
      * @param value The value or name of the variable to be assigned.
-     * @throws UninitializedVariableUsageException When trying to assign uninitialized variable.
-     * @throws InvalidAssignmentException          If the assignment is invalid for any other reason.
+     * @throws LogicException.UninitializedVariableUsageException When trying to assign uninitialized variable.
+     * @throws LogicException.InvalidAssignmentException          If the assignment is invalid for any other reason.
      */
-    void verifyValueAssignment(Variable var, String value) throws InvalidAssignmentException,
-            UninitializedVariableUsageException {
+    void verifyValueAssignment(Variable var, String value) throws LogicException{
         if (var.isFinal() && var.isInitialized()) {
-            throw new InvalidAssignmentException("Cannot assign value to final variable after declaration.");
+            throw new LogicException.InvalidAssignmentException("Cannot assign value to final variable after declaration.");
         }
         // Checks if the value is a valid assignment of a primitive value.
         else if (var.isValidValue(value)) {
@@ -120,7 +118,7 @@ public abstract class Scope {
             try {
                 assignee = getDefinedVariable(value);
             } catch (UnknownVariableException e) {
-                throw new InvalidAssignmentException(e.getMessage(), e);
+                throw new LogicException.InvalidAssignmentException(e.getMessage(), e);
             }
             if (assignee.isInitialized()) {
                 if (var.getClass().isInstance(assignee)) {
@@ -128,17 +126,17 @@ public abstract class Scope {
                 }
                 // Trying to assign var with invalid type.
                 else {
-                    throw new InvalidAssignmentException("Cannot assign variable of type '" + assignee.getTypeName()
+                    throw new LogicException.InvalidAssignmentException("Cannot assign variable of type '" + assignee.getTypeName()
                             + "' to variable of type '" + var.getTypeName() + "'.");
                 }
             }
             // Trying to assign uninitialized variable.
             else {
-                throw new UninitializedVariableUsageException(assignee);
+                throw new LogicException.UninitializedVariableUsageException(assignee);
             }
         }
         else {
-            throw new InvalidAssignmentException("Cannot assign value " + value + " to variable of type "
+            throw new LogicException.InvalidAssignmentException("Cannot assign value " + value + " to variable of type "
                     + var.getTypeName() + ".");
         }
     }
@@ -148,9 +146,9 @@ public abstract class Scope {
      * scope's symbol table.
      *
      * @param varDecLine The variable declaration line.
-     * @throws InvalidVariableDeclarationException When anything is wrong in the declaration.
+     * @throws LogicException.InvalidVariableDeclarationException When anything is wrong in the declaration.
      */
-    void parseVarDeclaration(String varDecLine) throws InvalidVariableDeclarationException {
+    void parseVarDeclaration(String varDecLine) throws LogicException{
         String currToken;  // The current token.
         boolean isFinal = false;  // Whether the declared variables are final.
         String type;  // The type name of the declared variables.
@@ -170,7 +168,7 @@ public abstract class Scope {
                 if (isVarnameDeclarable(currVarName)) {
                     currVar = VariableParser.createVariable(currToken, type, isFinal);
                 } else {
-                    throw new InvalidVariableDeclarationException("Cannot override declared variable '"
+                    throw new LogicException.InvalidVariableDeclarationException("Cannot override declared variable '"
                             + currVarName + "'.");
                 }
                 // At this point the variable name is declarable.
@@ -185,14 +183,14 @@ public abstract class Scope {
                     tokenIterator.next();  // null.
                 }
                 if (currVar.isFinal() && !currVar.isInitialized()) {
-                    throw new InvalidVariableDeclarationException("Variable '" + currVarName
+                    throw new LogicException.InvalidVariableDeclarationException("Variable '" + currVarName
                             + "' is declared final but is not initialized.");
                 }
                 addLocalVariable(currVar);
             }
-        } catch (SyntaxException | UnrecognizedVariableTypeException | InvalidAssignmentException
-                | UninitializedVariableUsageException e) {
-            throw new InvalidVariableDeclarationException(e.getMessage(), e);
+        } catch (SyntaxException | LogicException.UnrecognizedVariableTypeException | LogicException.InvalidAssignmentException
+                | LogicException.UninitializedVariableUsageException e) {
+            throw new LogicException.InvalidVariableDeclarationException(e.getMessage(), e);
         }
     }
 
@@ -201,11 +199,10 @@ public abstract class Scope {
      * @param assignLine The potential assignment line to be parsed.
      * @throws SyntaxException If the line is malformed.
      * @throws UnknownVariableException If the target variable name is not declared.
-     * @throws InvalidAssignmentException If the assignment is wrong for any other reason.
-     * @throws UninitializedVariableUsageException If the assigned value is a variable name of an uninitialized.
+     * @throws LogicException.InvalidAssignmentException If the assignment is wrong for any other reason.
+     * @throws LogicException.UninitializedVariableUsageException If the assigned value is a variable name of an uninitialized.
      */
-    void parseAssignment(String assignLine) throws SyntaxException, UnknownVariableException,
-            InvalidAssignmentException, UninitializedVariableUsageException {
+    void parseAssignment(String assignLine) throws SyntaxException, UnknownVariableException, LogicException{
         VariableAssignment assignment = VariableParser.getAssignment(assignLine);
         Variable target = getDefinedVariable(assignment.getTarget());
         verifyValueAssignment(target, assignment.getValue());
@@ -213,7 +210,7 @@ public abstract class Scope {
     }
 
 
-    void verifyScope() throws InvalidVariableDeclarationException, ScopeException{
+    void verifyScope() throws LogicException{
         try {
             for (LineNode son : root.getSons()) {
                 String headLine = son.getData();
@@ -229,22 +226,18 @@ public abstract class Scope {
                         if (global.getMethods().containsKey(methodName))
                             global.getMethods().get(methodName).methodCallVerify(this, argsPart);
                         else {
-                            throw new UnfamiliarMethodName();
+                            throw new LogicException.UnfamiliarMethodName();
                         }
                     } else if (VariableParser.isLegalVarDec(headLine))
                          parseVarDeclaration(headLine);
                     else if (VariableParser.isLegalAssignment(headLine))
                         parseAssignment(headLine);
                     else {
-                        throw new ExceptionFileFormat();
+                        throw new SyntaxException.ExceptionFileFormat();
                     }
                 }
-
             }
-        } catch (UnrecognizedVariableTypeException | InvalidAssignmentException
-                | UninitializedVariableUsageException|SyntaxException | UnknownVariableException  e) {
-            throw new InvalidVariableDeclarationException(e.getMessage(), e);
-        }catch (IllegalMethodCallException | UnfamiliarMethodName e){
+        } catch (LogicException|SyntaxException | UnknownVariableException  e) {
             throw new ScopeException(e.getMessage(), e);
         }
     }

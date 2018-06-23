@@ -22,19 +22,19 @@ class MethodScope extends Scope {
     private ArrayList<Variable> parameterList;
 
     MethodScope(LineNode root, Scope parent, GlobalScope globalScope) throws SyntaxException,
-            InvalidParameterListException {
+            LogicException{
         super(root, parent, globalScope);
         DecAnalyzer(root.getData());
     }
 
-    private void DecAnalyzer(String deceleration) throws  SyntaxException, InvalidParameterListException {
+    private void DecAnalyzer(String deceleration) throws  SyntaxException, LogicException{
         Pattern methodDecelerationPattern = Pattern.compile(METHOD_DECELERATION_REGEX);
         Matcher methodDecelerationMatcher = methodDecelerationPattern.matcher(deceleration);
         if(!methodDecelerationMatcher.find())
-            throw new ExceptionFileFormat( ILLEGAL_METHOD_DECELERATION);
+            throw new SyntaxException.ExceptionFileFormat( ILLEGAL_METHOD_DECELERATION);
         String name = methodDecelerationMatcher.group(NAME_PLC);
         if(global.getMethods().containsKey(name)) {
-            throw new ExceptionFileFormat( ILLEGAL_METHOD_NAME);
+            throw new SyntaxException.ExceptionFileFormat( ILLEGAL_METHOD_NAME);
         }
         parameterList = getParameterList(methodDecelerationMatcher.group(ARGS_PLC));
         global.setMethods(name, this);
@@ -46,10 +46,10 @@ class MethodScope extends Scope {
      * @param parameterList The content of the method declaration parentheses.
      * @return A linked list of parameter variables.
      * @throws SyntaxException When the parameter list syntax is wrong.
-     * @throws InvalidParameterListException When the parameter list is invalid.
+     * @throws LogicException.InvalidParameterListException When the parameter list is invalid.
      */
     private ArrayList<Variable> getParameterList(String parameterList) throws SyntaxException,
-            InvalidParameterListException {
+            LogicException{
         ArrayList<Variable> parameters = new ArrayList<>();
         String finalMod;  // The current token.
         boolean isFinal;  // Whether the declared parameter is final.
@@ -67,7 +67,7 @@ class MethodScope extends Scope {
                     currParam = VariableParser.createVariable(paramName, type, isFinal);
                 }
                 else {
-                    throw new InvalidParameterListException("Parameter name "
+                    throw new LogicException.InvalidParameterListException("Parameter name "
                             + paramName + " is already declared.");
                 }
                 currParam.initialize();  // A parameter variable is always initialized (assignable in method scope).
@@ -75,14 +75,13 @@ class MethodScope extends Scope {
                 parameters.add(currParam);
             }
         }
-        catch (UnrecognizedVariableTypeException e) {
-            throw new InvalidParameterListException(e.getMessage(), e);
+        catch (LogicException.UnrecognizedVariableTypeException e) {
+            throw new LogicException.InvalidParameterListException(e.getMessage(), e);
         }
         return parameters;
     }
 
-    void methodCallVerify(Scope callingScope, String parametersLine) throws IllegalMethodCallException,
-            InvalidAssignmentException, UninitializedVariableUsageException {
+    void methodCallVerify(Scope callingScope, String parametersLine) throws LogicException{
         String[] parameters;
         if(parametersLine.matches(" ?"))
             parameters = new String[0];

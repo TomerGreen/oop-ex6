@@ -14,13 +14,13 @@ public class LineTree {
     private final static String ROOT_LINE = "class;";
     private final static String SINGLE_LINE_SUFFIX_REGEX = ";";
     private final static String BEG_OF_SCOPE_REGEX = "( ?\\{)";
-    private final static String END_OF_SCOPE_REGEX = "(\\})";
+    private final static String END_OF_SCOPE_REGEX = "(})";
 
     private LineNode root;
 
     private static int lineNumber;
 
-    public LineTree(BufferedReader br) throws IOException, ExceptionFileFormat {
+    LineTree(BufferedReader br) throws IOException, SyntaxException{
         lineNumber = 0;
         root = parser(br, new LineNode(ROOT_LINE, null, lineNumber));
     }
@@ -33,7 +33,7 @@ public class LineTree {
      * method which parse the sjava file to a tree of nested scopes which is easier to analyze.
      * @param br a BufferedReader of the original file we parse
      */
-    private LineNode parser(BufferedReader br, LineNode currRoot) throws IOException, ExceptionFileFormat {
+    private LineNode parser(BufferedReader br, LineNode currRoot) throws IOException, SyntaxException{
         String line;
         line = getLine(br);
         Pattern singleLinePattern = Pattern.compile(SINGLE_LINE_SUFFIX_REGEX);
@@ -55,7 +55,7 @@ public class LineTree {
                         return currRoot;
                     }
                     else {
-                        throw new ExceptionFileFormat();
+                        throw new SyntaxException.ExceptionFileFormat();
                     }
                 }
             }
@@ -65,7 +65,7 @@ public class LineTree {
             return currRoot;
         }
         else {
-            throw new ExceptionFileFormat();
+            throw new SyntaxException.ExceptionFileFormat();
         }
     }
 

@@ -30,6 +30,8 @@ public class LineNode {
         return sons;
     }
 
+
+    // TODO usage in Exceptions
     public int getLineNumber() {
         return lineNumber;
     }

@@ -23,33 +23,31 @@ public class GlobalScope extends Scope {
             methods = new HashMap<>();
             analyzeGlobalScope();
             verifyAllMethods();
-        }catch (NoReturnException | ScopeException | InvalidVariableDeclarationException | InvalidAssignmentException
-                | UninitializedVariableUsageException e){
+        }catch (LogicException e){
             throw new GlobalScopeException(e.getMessage(), e);
         } catch (UnknownVariableException e) {
             e.printStackTrace();
         }
     }
 
-    private void analyzeGlobalScope() throws SyntaxException, InvalidVariableDeclarationException,
-            UnknownVariableException, InvalidAssignmentException, UninitializedVariableUsageException {
+    private void analyzeGlobalScope() throws SyntaxException,UnknownVariableException, LogicException{
         if(root.getSons().size() !=0){
             for (LineNode declareLine : root.getSons()) {
                 String line = declareLine.getData();
                 if(line.matches(RETURN))
-                    throw new ExceptionFileFormat(GLOBAL_RETURN);
+                    throw new SyntaxException.ExceptionFileFormat(GLOBAL_RETURN);
                 else if (line.startsWith(VOID))
                     new MethodScope(declareLine, null, this);
                 else if (VariableParser.isLegalVarDec(line))
                     parseVarDeclaration(line);
                 else if (VariableParser.isLegalAssignment(line))
                     parseAssignment(line);
-                else{ throw new  ExceptionFileFormat();}
+                else{ throw new SyntaxException.ExceptionFileFormat();}
             }
         }
     }
 
-    private void verifyAllMethods() throws NoReturnException, InvalidVariableDeclarationException, ScopeException {
+    private void verifyAllMethods() throws LogicException{
         for (Map.Entry<String, MethodScope> method: methods.entrySet()){
             MethodScope currMethod = method.getValue();
             ArrayList<LineNode> methodBody = currMethod.root.getSons();
@@ -57,11 +55,11 @@ public class GlobalScope extends Scope {
             if(numOfMethodLines > 0){
                 String lastMethodLine = methodBody.get(numOfMethodLines -1).getData();
                 if(!lastMethodLine.matches(RETURN))
-                    throw new NoReturnException(NO_RETURN_EXCEPTION);
+                    throw new LogicException.NoReturnException(NO_RETURN_EXCEPTION);
                 currMethod.verifyScope();
             }
             else
-                throw new NoReturnException(NO_RETURN_EXCEPTION);
+                throw new LogicException.NoReturnException(NO_RETURN_EXCEPTION);
         }
     }
 

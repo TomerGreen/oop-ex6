@@ -1,7 +1,7 @@
 package oop.ex6.variables;
 
+import oop.ex6.main.LogicException;
 import oop.ex6.main.SyntaxException;
-import oop.ex6.main.UnrecognizedVariableTypeException;
 
 import java.util.LinkedList;
 import java.util.regex.*;
@@ -40,10 +40,10 @@ public class VariableParser {
      * @param type The variable type.
      * @param isFinal Whether it should be final.
      * @return A variable object.
-     * @throws UnrecognizedVariableTypeException When the type name is unrecognized.
+     * @throws LogicException.UnrecognizedVariableTypeException When the type name is unrecognized.
      */
     public static Variable createVariable(String varName, String type, boolean isFinal)
-            throws UnrecognizedVariableTypeException {
+            throws LogicException.UnrecognizedVariableTypeException {
         if (type.equals("boolean")) {
             return new BooleanVariable(varName, isFinal);
         }
@@ -60,7 +60,7 @@ public class VariableParser {
             return new StringVariable(varName, isFinal);
         }
         else {
-            throw new UnrecognizedVariableTypeException(type);
+            throw new LogicException.UnrecognizedVariableTypeException(type);
         }
     }
 
