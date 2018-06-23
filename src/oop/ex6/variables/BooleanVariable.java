@@ -1,7 +1,5 @@
 package oop.ex6.variables;
 
-import oop.ex6.variables.Variable;
-
 /**
  * Represents a boolean variable.
  */
@@ -16,7 +14,7 @@ public class BooleanVariable extends Variable {
      * @param name The variable name.
      * @param isFinal Whether it is defined as final.
      */
-    public BooleanVariable(String name, boolean isFinal) {
+    BooleanVariable(String name, boolean isFinal) {
         super(name, isFinal);
     }
 

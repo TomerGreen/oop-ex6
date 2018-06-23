@@ -1,7 +1,5 @@
 package oop.ex6.variables;
 
-import oop.ex6.variables.Variable;
-
 /**
  * Represents a char variable.
  */
@@ -16,7 +14,7 @@ public class CharVariable extends Variable {
      * @param name The variable name.
      * @param isFinal Whether it is defined as final.
      */
-    public CharVariable(String name, boolean isFinal) {
+    CharVariable(String name, boolean isFinal) {
         super(name, isFinal);
     }
 

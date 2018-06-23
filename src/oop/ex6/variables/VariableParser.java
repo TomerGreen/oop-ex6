@@ -16,8 +16,6 @@ public class VariableParser {
     private static final String DECLARATION_SEPARATOR = ",";
     private static final String FINAL_VARIABLE_DECLARATION_PREFIX = "(?:(final) )?";
     private static final String VARIABLE_TYPES_REGEX = "((?:int)|(?:boolean)|(?:String)|(?:double)|(?:char)) ";
-    // TODO: Consider following line instead (to minimize effort when creating new var type.
-    //private static final String VARIABLE_TYPES_REGEX = "([a-zA-Z]+) ";
     private static final String LEGAL_VAR_NAME_REGEX = "(_*[a-zA-Z]\\w*)";
     // Note that this regex matches ANY string as assigned value, using reluctant quantifier.
     private static final String ASSIGNMENT_WITHOUT_VAR_NAME = " ?(=) ?(.*?)";
@@ -44,23 +42,19 @@ public class VariableParser {
      */
     public static Variable createVariable(String varName, String type, boolean isFinal)
             throws LogicException.UnrecognizedVariableTypeException {
-        if (type.equals("boolean")) {
-            return new BooleanVariable(varName, isFinal);
-        }
-        else if (type.equals("int")) {
-            return new IntVariable(varName,isFinal);
-        }
-        else if (type.equals("double")) {
-            return new DoubleVariable(varName, isFinal);
-        }
-        else if (type.equals("char")) {
-            return new CharVariable(varName, isFinal);
-        }
-        else if (type.equals("String")) {
-            return new StringVariable(varName, isFinal);
-        }
-        else {
-            throw new LogicException.UnrecognizedVariableTypeException(type);
+        switch (type) {
+            case "boolean":
+                return new BooleanVariable(varName, isFinal);
+            case "int":
+                return new IntVariable(varName, isFinal);
+            case "double":
+                return new DoubleVariable(varName, isFinal);
+            case "char":
+                return new CharVariable(varName, isFinal);
+            case "String":
+                return new StringVariable(varName, isFinal);
+            default:
+                throw new LogicException.UnrecognizedVariableTypeException(type);
         }
     }
 
@@ -171,21 +165,6 @@ public class VariableParser {
             throw new SyntaxException("Illegal assignment syntax \"" + line + "\"." );
         }
         return assignment;
-    }
-
-    /* todo - helper method for testing. Delete when submitting. */
-    public static boolean isVarDec(String value) {
-        System.out.println("Regex is: ");
-        System.out.println(VARIABLE_DECLARATION_REGEX);
-        Pattern pattern = Pattern.compile(VARIABLE_DECLARATION_REGEX);
-        Matcher matcher = pattern.matcher(value);
-        if (matcher.matches()) {
-            for (int i=1; i < matcher.groupCount(); i++) {
-                System.out.println(matcher.group(i));
-            }
-            return true;
-        }
-        return false;
     }
 
 

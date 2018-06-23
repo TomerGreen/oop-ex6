@@ -2,8 +2,6 @@ package oop.ex6.variables;
 
 public abstract class Variable {
 
-    protected static String typeName;
-
     /* The varname */
     private String name;
 
@@ -55,8 +53,8 @@ public abstract class Variable {
 
     /**
      * Checks if assigned value is formatted properly for that variable type.
-     * @param value
-     * @return
+     * @param value the checked value
+     * @return if valid or not
      */
     public abstract boolean isValidValue(String value);
 

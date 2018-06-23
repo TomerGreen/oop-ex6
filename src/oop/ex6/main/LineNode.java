@@ -10,7 +10,7 @@ public class LineNode {
     private int lineNumber;
 
 
-    public LineNode(String dataLine, LineNode parent, int lineNumber)
+    LineNode(String dataLine, LineNode parent, int lineNumber)
     {
         data = dataLine;
         this.parent = parent;
@@ -18,7 +18,7 @@ public class LineNode {
         sons = new ArrayList<>();
     }
 
-    public void addSon(LineNode newSon){
+    void addSon(LineNode newSon){
         sons.add(newSon);
     }
 
@@ -36,7 +36,7 @@ public class LineNode {
         return lineNumber;
     }
 
-    public LineNode getParent() {
+    LineNode getParent() {
         return parent;
     }
 }

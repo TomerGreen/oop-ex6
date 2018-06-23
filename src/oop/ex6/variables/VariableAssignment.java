@@ -16,7 +16,7 @@ public class VariableAssignment {
      * @param target The target variable name.
      * @param value The value.
      */
-    public VariableAssignment(String target, String value) {
+    VariableAssignment(String target, String value) {
         this.target = target;
         this.value = value;
     }

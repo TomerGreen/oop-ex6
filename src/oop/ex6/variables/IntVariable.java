@@ -1,7 +1,5 @@
 package oop.ex6.variables;
 
-import oop.ex6.variables.DoubleVariable;
-
 /**
  * Represents an integer variable.
  */
@@ -16,7 +14,7 @@ public class IntVariable extends DoubleVariable {
      * @param name The var name.
      * @param isFinal Whether it's final.
      */
-    public IntVariable(String name, boolean isFinal) {
+    IntVariable(String name, boolean isFinal) {
         super(name, isFinal);
     }
 
