@@ -15,7 +15,7 @@ public class GlobalScope extends Scope {
     private static final String VOID = "void";
     private static final String NO_RETURN_EXCEPTION = "NoReturnException";
     private static final String GLOBAL_RETURN = "return line in global scope";
-    HashMap<String, MethodScope> methods;
+    private HashMap<String, MethodScope> methods;
 
     public GlobalScope(LineTree tree) throws SyntaxException, GlobalScopeException{
         super(tree.getRoot(), null, null);
@@ -65,7 +65,7 @@ public class GlobalScope extends Scope {
         }
     }
 
-    public void setMethods(String name, MethodScope methodScope){
+    void setMethods(String name, MethodScope methodScope){
         methods.put(name, methodScope);
     }
 

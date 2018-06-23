@@ -15,8 +15,6 @@ public class Sjavac {
     private final static String BAD_FORMAT_ERROR = "1";
     private final static String PARAMETERS_ERROR = "2";
     private final static String SJAVA_TYPE = ".sjava";
-    private final static String ARGUMENTS_ERROR = "arguments error";
-    private final static String FILE_FORMAT_ILLEGAL = "file format illegal";
 
     public static void main(String args[]){
         try {
@@ -31,10 +29,6 @@ public class Sjavac {
 
 
             System.out.println(FILE_FORMAT_IS_OK);
-
-            // todo send the root to global class statement constructor and receive Symbol tables
-
-            //todo run over the LineTree and verify all the methods
 
         }catch (IOException e) {
             System.out.println(PARAMETERS_ERROR);

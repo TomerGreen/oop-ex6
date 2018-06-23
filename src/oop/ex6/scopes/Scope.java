@@ -21,12 +21,15 @@ public abstract class Scope {
     static final String BRACKETS_CONTENTS = " ?\\((.*?)\\) ?";
     private static final String CONDITION_SCOPE_DEC_REGEX = CONDITION_TYPES_REGEX + BRACKETS_CONTENTS + "\\{";
     private static final String METHOD_CALL_REGEX = METHOD_NAME_REGEX + BRACKETS_CONTENTS + ";";
+    private static Pattern conditionScopeDecPattern;
+    private static Pattern methodCallPattern;
+    private static boolean isInitialized = false;
 
 
     /**
      * The root of the line tree that represents this scope.
      */
-    protected LineNode root;
+    LineNode root;
 
     /**
      * The variables that were defined locally in the statement.
@@ -48,6 +51,11 @@ public abstract class Scope {
         this.root = root;
         this.parent = parent;
         variables = new HashMap<>();
+        if(!isInitialized){
+            conditionScopeDecPattern = Pattern.compile(CONDITION_SCOPE_DEC_REGEX);
+            methodCallPattern = Pattern.compile(METHOD_CALL_REGEX);
+            isInitialized = true;
+        }
     }
 
 
@@ -75,23 +83,8 @@ public abstract class Scope {
      *
      * @param var The variable to be added.
      */
-    protected void addLocalVariable(Variable var) {
+    void addLocalVariable(Variable var) {
         variables.put(var.getName(), var);
-    }
-
-    // TODO not sure if this method is necessary.
-
-    /**
-     * Returns whether the given variable name represents a defined and initialized variable.
-     * A usable variable name can be used as a method argument, or assigned to another variable.
-     *
-     * @param varName The given variable name.
-     * @return Whether it is usable.
-     * @throws UnknownVariableException If the variable is not defined (unassignable).
-     */
-    protected boolean isVarnameUsable(String varName) throws UnknownVariableException {
-        Variable var = getDefinedVariable(varName);
-        return var.isInitialized();
     }
 
     /**
@@ -100,7 +93,7 @@ public abstract class Scope {
      * @param varName The given var name.
      * @return Whether it is definable.
      */
-    protected boolean isVarnameDeclarable(String varName) {
+    boolean isVarnameDeclarable(String varName) {
         return !this.variables.containsKey(varName);
     }
 
@@ -112,7 +105,7 @@ public abstract class Scope {
      * @throws UninitializedVariableUsageException When trying to assign uninitialized variable.
      * @throws InvalidAssignmentException          If the assignment is invalid for any other reason.
      */
-    protected void verifyValueAssignment(Variable var, String value) throws InvalidAssignmentException,
+    void verifyValueAssignment(Variable var, String value) throws InvalidAssignmentException,
             UninitializedVariableUsageException {
         if (var.isFinal() && var.isInitialized()) {
             throw new InvalidAssignmentException("Cannot assign value to final variable after declaration.");
@@ -130,7 +123,6 @@ public abstract class Scope {
                 throw new InvalidAssignmentException(e.getMessage(), e);
             }
             if (assignee.isInitialized()) {
-                // todo TEST!!!
                 if (var.getClass().isInstance(assignee)) {
                     return;
                 }
@@ -151,8 +143,6 @@ public abstract class Scope {
         }
     }
 
-    // TODO shouldn't be public.
-
     /**
      * Receives a potentially valid variable declaration line, and creates the appropriate variables in the
      * scope's symbol table.
@@ -160,7 +150,7 @@ public abstract class Scope {
      * @param varDecLine The variable declaration line.
      * @throws InvalidVariableDeclarationException When anything is wrong in the declaration.
      */
-    public void parseVarDeclaration(String varDecLine) throws InvalidVariableDeclarationException {
+    void parseVarDeclaration(String varDecLine) throws InvalidVariableDeclarationException {
         String currToken;  // The current token.
         boolean isFinal = false;  // Whether the declared variables are final.
         String type;  // The type name of the declared variables.
@@ -214,40 +204,42 @@ public abstract class Scope {
      * @throws InvalidAssignmentException If the assignment is wrong for any other reason.
      * @throws UninitializedVariableUsageException If the assigned value is a variable name of an uninitialized.
      */
-    protected void parseAssignment(String assignLine) throws SyntaxException, UnknownVariableException,
+    void parseAssignment(String assignLine) throws SyntaxException, UnknownVariableException,
             InvalidAssignmentException, UninitializedVariableUsageException {
         VariableAssignment assignment = VariableParser.getAssignment(assignLine);
         Variable target = getDefinedVariable(assignment.getTarget());
         verifyValueAssignment(target, assignment.getValue());
         target.initialize();
     }
-    protected void verifyScope() throws InvalidVariableDeclarationException, ScopeException{
-        Pattern conditionScopeDecPattern = Pattern.compile(CONDITION_SCOPE_DEC_REGEX);
-        Pattern methodCallPattern = Pattern.compile(METHOD_CALL_REGEX);
+
+
+    void verifyScope() throws InvalidVariableDeclarationException, ScopeException{
         try {
             for (LineNode son : root.getSons()) {
-                String openingLine = son.getData();
-                Matcher methodCallMatcher = methodCallPattern.matcher(openingLine);
-                Matcher conditionScopeMatcher = conditionScopeDecPattern.matcher(openingLine);
+                String headLine = son.getData();
+                Matcher methodCallMatcher = methodCallPattern.matcher(headLine);
+                Matcher conditionScopeMatcher = conditionScopeDecPattern.matcher(headLine);
                 if (conditionScopeMatcher.find()) {
                     String conditionPart = conditionScopeMatcher.group(2);
                     new ConditionScope(son, this, conditionPart, global);
-                } else if(openingLine.matches(RETURN)) { } //method's last return line was considered previously
-                else if (methodCallMatcher.find() && methodCallMatcher.start() == 0) {
-                    String methodName = methodCallMatcher.group(1);
-                    String argsPart = methodCallMatcher.group(2);
-                    if (global.getMethods().containsKey(methodName))
-                        global.getMethods().get(methodName).methodCallVerify(this, argsPart);
+                } else if (!headLine.matches(RETURN)) {
+                    if (methodCallMatcher.find() && methodCallMatcher.start() == 0) {
+                        String methodName = methodCallMatcher.group(1);
+                        String argsPart = methodCallMatcher.group(2);
+                        if (global.getMethods().containsKey(methodName))
+                            global.getMethods().get(methodName).methodCallVerify(this, argsPart);
+                        else {
+                            throw new UnfamiliarMethodName();
+                        }
+                    } else if (VariableParser.isLegalVarDec(headLine))
+                         parseVarDeclaration(headLine);
+                    else if (VariableParser.isLegalAssignment(headLine))
+                        parseAssignment(headLine);
                     else {
-                        throw new UnfamiliarMethodName();
+                        throw new ExceptionFileFormat();
                     }
-                } else if (VariableParser.isLegalVarDec(openingLine))
-                     parseVarDeclaration(openingLine);
-                else if (VariableParser.isLegalAssignment(openingLine))
-                    parseAssignment(openingLine);
-                else {
-                    throw new ExceptionFileFormat();
                 }
+
             }
         } catch (UnrecognizedVariableTypeException | InvalidAssignmentException
                 | UninitializedVariableUsageException|SyntaxException | UnknownVariableException  e) {
@@ -255,7 +247,7 @@ public abstract class Scope {
         }catch (IllegalMethodCallException | UnfamiliarMethodName e){
             throw new ScopeException(e.getMessage(), e);
         }
-
-
     }
+
+    void varAssignDeclareCheck(String lineToCheck){} // todo method which replace the duplicate code
 }

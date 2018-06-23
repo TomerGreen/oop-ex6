@@ -9,11 +9,8 @@ class IllegalMethodCallException extends LogicException{
 
     private static final String DEFAULT_MSG = "Illegal method call";
 
-    public IllegalMethodCallException() {
+    IllegalMethodCallException() {
         super(DEFAULT_MSG);
     }
 
-    public IllegalMethodCallException(String message) {
-        super(message);
-    }
 }

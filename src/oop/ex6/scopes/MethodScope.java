@@ -9,10 +9,9 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MethodScope extends Scope {
+class MethodScope extends Scope {
 
 
-    //todo change to whole deceleration
     private static final String COMMA = ",";
     private static final String METHOD_DECELERATION_REGEX = "void "+ METHOD_NAME_REGEX + BRACKETS_CONTENTS + " ?\\{";
     private static final String ILLEGAL_METHOD_DECELERATION = "illegal method deceleration";
@@ -20,11 +19,9 @@ public class MethodScope extends Scope {
     private static final int NAME_PLC = 1;
     private static final int ARGS_PLC = 2;
 
-    String name;
+    private ArrayList<Variable> parameterList;
 
-    ArrayList<Variable> parameterList;
-
-    public MethodScope(LineNode root, Scope parent, GlobalScope globalScope) throws SyntaxException,
+    MethodScope(LineNode root, Scope parent, GlobalScope globalScope) throws SyntaxException,
             InvalidParameterListException {
         super(root, parent, globalScope);
         DecAnalyzer(root.getData());
@@ -35,7 +32,7 @@ public class MethodScope extends Scope {
         Matcher methodDecelerationMatcher = methodDecelerationPattern.matcher(deceleration);
         if(!methodDecelerationMatcher.find())
             throw new ExceptionFileFormat( ILLEGAL_METHOD_DECELERATION);
-        name = methodDecelerationMatcher.group(NAME_PLC);
+        String name = methodDecelerationMatcher.group(NAME_PLC);
         if(global.getMethods().containsKey(name)) {
             throw new ExceptionFileFormat( ILLEGAL_METHOD_NAME);
         }
@@ -63,11 +60,7 @@ public class MethodScope extends Scope {
             Iterator<String> tokenIterator = VariableParser.getTokenizedParameterList(parameterList).iterator();
             while (tokenIterator.hasNext()) {
                 finalMod = tokenIterator.next();  // A "final" modifier or null.
-                if (finalMod != null && finalMod.equals(FINAL)) {
-                    isFinal = true;
-                } else {
-                    isFinal = false;
-                }
+                isFinal = ((finalMod != null) && finalMod.equals(FINAL));
                 type = tokenIterator.next();  // A variable type.
                 paramName = tokenIterator.next();  // A parameter name.
                 if (isVarnameDeclarable(paramName)) {

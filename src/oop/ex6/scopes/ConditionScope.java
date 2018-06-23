@@ -8,7 +8,7 @@ public class ConditionScope extends Scope {
 
     private final static String AND_OR_REGEX = "(&&)|(\\|\\|)";
 
-    public ConditionScope(LineNode root, Scope parent, String booleanCondition, GlobalScope globalScope) throws
+    ConditionScope(LineNode root, Scope parent, String booleanCondition, GlobalScope globalScope) throws
             InvalidVariableDeclarationException,InvalidAssignmentException, UninitializedVariableUsageException,
             UnrecognizedVariableTypeException, ScopeException {
         super(root, parent, globalScope);
