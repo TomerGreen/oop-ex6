@@ -1,6 +1,8 @@
-package oop.ex6.main;
+package oop.ex6.scopes;
 
-public class NoReturnException extends LogicException{
+import oop.ex6.main.LogicException;
+
+public class NoReturnException extends LogicException {
 
 
     public NoReturnException(String message, Exception cause) {

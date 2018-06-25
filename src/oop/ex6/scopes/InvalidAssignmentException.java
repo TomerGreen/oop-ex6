@@ -1,4 +1,6 @@
-package oop.ex6.main;
+package oop.ex6.scopes;
+
+import oop.ex6.main.LogicException;
 
 /**
  * Thrown when something is wrong with a variable assignment.

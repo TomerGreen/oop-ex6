@@ -1,10 +1,12 @@
-package oop.ex6.main;
+package oop.ex6.scopes;
 
+
+import oop.ex6.main.LogicException;
 
 /**
  * Thrown when an undefined method name is referred.
  */
-public class UnfamiliarMethodName extends LogicException{
+public class UnfamiliarMethodName extends LogicException {
 
     private static final String DEFAULT_MSG = "UnfamiliarMethodName";
 

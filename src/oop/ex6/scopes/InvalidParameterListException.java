@@ -1,4 +1,4 @@
-package oop.ex6.main;
+package oop.ex6.scopes;
 
 /**
  * Thrown when the parameter list is invalid.

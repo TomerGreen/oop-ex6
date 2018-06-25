@@ -10,6 +10,10 @@ import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Represents and verifies an entire block of code, enclosed in {}.
+ * Types of scopes are if/while clauses, methods, and the program file itself.
+ */
 public abstract class Scope {
 
     ////////////////////////////////////CONSTANTS////////////////////////////;
@@ -23,7 +27,6 @@ public abstract class Scope {
     private static Pattern conditionScopeDecPattern;
     private static Pattern methodCallPattern;
     private static boolean isInitialized = false;
-
 
     /**
      * The root of the line tree that represents this scope.
@@ -50,7 +53,7 @@ public abstract class Scope {
         this.root = root;
         this.parent = parent;
         variables = new HashMap<>();
-        if(!isInitialized){
+        if (!isInitialized) {
             conditionScopeDecPattern = Pattern.compile(CONDITION_SCOPE_DEC_REGEX);
             methodCallPattern = Pattern.compile(METHOD_CALL_REGEX);
             isInitialized = true;
@@ -104,14 +107,14 @@ public abstract class Scope {
      * @throws LogicException.UninitializedVariableUsageException When trying to assign uninitialized variable.
      * @throws LogicException.InvalidAssignmentException          If the assignment is invalid for any other reason.
      */
-    void verifyValueAssignment(Variable var, String value) throws LogicException{
+    void verifyValueAssignment(Variable var, String value) throws LogicException {
         if (var.isFinal() && var.isInitialized()) {
             throw new LogicException.InvalidAssignmentException("Cannot assign value to final variable after declaration.");
         }
         // Checks if the value is a valid assignment of a primitive value.
         else if (var.isValidValue(value)) {
-                return;
-            }
+            return;
+        }
         // Checks if the assigned value is a variable name of a usable variable.
         else if (VariableParser.isLegalVarName(value)) {
             Variable assignee;  // Throws exception if assignee wasn't returned.
@@ -134,8 +137,7 @@ public abstract class Scope {
             else {
                 throw new LogicException.UninitializedVariableUsageException(assignee);
             }
-        }
-        else {
+        } else {
             throw new LogicException.InvalidAssignmentException("Cannot assign value " + value + " to variable of type "
                     + var.getTypeName() + ".");
         }
@@ -148,7 +150,7 @@ public abstract class Scope {
      * @param varDecLine The variable declaration line.
      * @throws LogicException.InvalidVariableDeclarationException When anything is wrong in the declaration.
      */
-    void parseVarDeclaration(String varDecLine) throws LogicException{
+    void parseVarDeclaration(String varDecLine) throws LogicException {
         String currToken;  // The current token.
         boolean isFinal = false;  // Whether the declared variables are final.
         String type;  // The type name of the declared variables.
@@ -196,13 +198,14 @@ public abstract class Scope {
 
     /**
      * Checks if an assignment line is valid.
+     *
      * @param assignLine The potential assignment line to be parsed.
-     * @throws SyntaxException If the line is malformed.
-     * @throws UnknownVariableException If the target variable name is not declared.
-     * @throws LogicException.InvalidAssignmentException If the assignment is wrong for any other reason.
+     * @throws SyntaxException                                    If the line is malformed.
+     * @throws UnknownVariableException                           If the target variable name is not declared.
+     * @throws LogicException.InvalidAssignmentException          If the assignment is wrong for any other reason.
      * @throws LogicException.UninitializedVariableUsageException If the assigned value is a variable name of an uninitialized.
      */
-    void parseAssignment(String assignLine) throws SyntaxException, UnknownVariableException, LogicException{
+    void parseAssignment(String assignLine) throws SyntaxException, UnknownVariableException, LogicException {
         VariableAssignment assignment = VariableParser.getAssignment(assignLine);
         Variable target = getDefinedVariable(assignment.getTarget());
         verifyValueAssignment(target, assignment.getValue());
@@ -210,7 +213,11 @@ public abstract class Scope {
     }
 
 
-    void verifyScope() throws LogicException{
+    /**
+     * Verifies an entire block, line by line.
+     * @throws LogicException If there's any non-syntax error.
+     */
+    void verifyScope() throws LogicException {
         try {
             for (LineNode son : root.getSons()) {
                 String headLine = son.getData();
@@ -229,7 +236,7 @@ public abstract class Scope {
                             throw new LogicException.UnfamiliarMethodName();
                         }
                     } else if (VariableParser.isLegalVarDec(headLine))
-                         parseVarDeclaration(headLine);
+                        parseVarDeclaration(headLine);
                     else if (VariableParser.isLegalAssignment(headLine))
                         parseAssignment(headLine);
                     else {
@@ -237,10 +244,8 @@ public abstract class Scope {
                     }
                 }
             }
-        } catch (LogicException|SyntaxException | UnknownVariableException  e) {
+        } catch (LogicException | SyntaxException | UnknownVariableException e) {
             throw new ScopeException(e.getMessage(), e);
         }
     }
-
-    void varAssignDeclareCheck(String lineToCheck){} // todo method which replace the duplicate code
 }

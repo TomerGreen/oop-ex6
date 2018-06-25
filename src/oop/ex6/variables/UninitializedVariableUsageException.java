@@ -1,5 +1,6 @@
-package oop.ex6.main;
+package oop.ex6.variables;
 
+import oop.ex6.main.LogicException;
 import oop.ex6.variables.Variable;
 
 /**
