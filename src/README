@@ -65,6 +65,12 @@ scope itself.
 This distinction simplified much of the code, since checking whether a variable name has any of these properties is done
 by calling the corresponding method for the scope when it is declared, assigned, or used.
 
+*  When parsing an assignment statement, we need to parse the data regarding the target variable name and the assigned
+value or variable name to a scope object, in order to check that the variable name is assignable, and that the assigned
+variable is usable or the assigned primitive value is legal. This is done by creating a VariableAssignment object that
+is returned by the VariableParser method parsing the assignment. This is instead of returning a less self-explaining object
+such as a size two array.
+
 
 =============================
 =   Answers to Questions    =
