@@ -19,6 +19,7 @@ public class InvalidAssignmentException extends LogicException {
     /**
      * A constructor with cause.
      * @param message The message.
+     * @param cause the cause for the exception
      */
     public InvalidAssignmentException(String message, Exception cause) {
         super(message, cause);

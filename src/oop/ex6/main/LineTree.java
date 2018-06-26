@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+/**
+ * A class of the object LineTree - the first data structure the input code parsed to.
+ */
 public class LineTree {
 
     ////////////////////////////////////////CONSTANTS////////////////////////////////////////////////////
@@ -14,7 +16,7 @@ public class LineTree {
     private final static String ROOT_LINE = "class;";
     private final static String SINGLE_LINE_SUFFIX_REGEX = ";";
     private final static String BEG_OF_SCOPE_REGEX = "( ?\\{)";
-    private final static String END_OF_SCOPE_REGEX = "(})";
+    private final static String END_OF_SCOPE_REGEX = "}";
 
     private LineNode root;
 
@@ -25,6 +27,9 @@ public class LineTree {
         root = parser(br, new LineNode(ROOT_LINE, null, lineNumber));
     }
 
+    /**
+     * @return the root's of the tree
+     */
     public LineNode getRoot() {
         return root;
     }
@@ -42,7 +47,7 @@ public class LineTree {
             // check that line isn't a comment or empty
             if(!line.startsWith(COMMENT_PREFIX_REGEX)){
                 line = line.trim().replaceAll("\\s+"," ");
-                if(!line.matches(EMPTY_LINE)){
+                if(!line.equals(EMPTY_LINE)){
                     Matcher singleLineMatcher = singleLinePattern.matcher(line);
                     Matcher begOfScopeMatcher = begOfScopePattern.matcher(line);
                     if(singleLineMatcher.find()) {
@@ -51,7 +56,7 @@ public class LineTree {
                     else if(begOfScopeMatcher.find()) {
                         currRoot.addSon(parser(br, new LineNode(line, currRoot, lineNumber)));
                     }
-                    else if(line.matches(END_OF_SCOPE_REGEX) && currRoot.getParent() != null) {
+                    else if(line.equals(END_OF_SCOPE_REGEX) && currRoot.getParent() != null) {
                         return currRoot;
                     }
                     else {
@@ -69,6 +74,11 @@ public class LineTree {
         }
     }
 
+    /**
+     * @param br the buffer reader of the Sjava code
+     * @return new line or null when there's no more lines
+     * @throws IOException when the buffer reader fails
+     */
     private String getLine(BufferedReader br) throws IOException {
         lineNumber++;
         String line = br.readLine();

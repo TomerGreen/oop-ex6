@@ -7,6 +7,7 @@ import oop.ex6.variables.VariableParser;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 public class GlobalScope extends Scope {
 
@@ -30,11 +31,18 @@ public class GlobalScope extends Scope {
         }
     }
 
+    /**
+     * Analyzes the global Scope
+     * @throws SyntaxException when syntax problem reached
+     * @throws UnknownVariableException when we get to unknown variable
+     * @throws LogicException when we get to logical problem in the given code.
+     */
     private void analyzeGlobalScope() throws SyntaxException,UnknownVariableException, LogicException{
         if(root.getSons().size() !=0){
             for (LineNode declareLine : root.getSons()) {
                 String line = declareLine.getData();
-                if(line.matches(RETURN))
+                Matcher returnMatcher = returnPattern.matcher(line);
+                if(returnMatcher.matches())
                     throw new SyntaxException.ExceptionFileFormat(GLOBAL_RETURN);
                 else if (line.startsWith(VOID))
                     new MethodScope(declareLine, null, this);
@@ -47,6 +55,10 @@ public class GlobalScope extends Scope {
         }
     }
 
+    /**
+     * verify all the methods of the program
+     * @throws LogicException when there's logic exception in the given Sjava code
+     */
     private void verifyAllMethods() throws LogicException{
         for (Map.Entry<String, MethodScope> method: methods.entrySet()){
             MethodScope currMethod = method.getValue();
@@ -54,19 +66,27 @@ public class GlobalScope extends Scope {
             int numOfMethodLines = methodBody.size();
             if(numOfMethodLines > 0){
                 String lastMethodLine = methodBody.get(numOfMethodLines -1).getData();
-                if(!lastMethodLine.matches(RETURN))
-                    throw new LogicException.NoReturnException(NO_RETURN_EXCEPTION);
+                Matcher returnMatcher = returnPattern.matcher(lastMethodLine);
+                if(!returnMatcher.matches())
+                    throw new NoReturnException(NO_RETURN_EXCEPTION);
                 currMethod.verifyScope();
             }
             else
-                throw new LogicException.NoReturnException(NO_RETURN_EXCEPTION);
+                throw new NoReturnException(NO_RETURN_EXCEPTION);
         }
     }
 
+    /**
+     * @param name the name of the new method
+     * @param methodScope the new method scope
+     */
     void setMethods(String name, MethodScope methodScope){
         methods.put(name, methodScope);
     }
 
+    /**
+     * @return the methods of the program
+     */
     HashMap<String, MethodScope> getMethods() {
         return methods;
     }

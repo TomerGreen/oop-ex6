@@ -7,6 +7,8 @@ public class InvalidParameterListException extends InvalidVariableDeclarationExc
 
     /**
      * Constructor with cause.
+     * @param message the printed message
+     * @param cause the cause of the specific exception
      */
     public InvalidParameterListException(String message, Exception cause) {
         super(message, cause);
@@ -14,6 +16,7 @@ public class InvalidParameterListException extends InvalidVariableDeclarationExc
 
     /**
      * A rebel without a cause.
+     * @param message the printed message
      */
     public InvalidParameterListException(String message) {
         super(message);

@@ -10,6 +10,7 @@ public class InvalidVariableDeclarationException extends LogicException {
     /**
      * Creates a new exception.
      * @param message The exception message.
+     * @param cause the cause of the specific exception
      */
     public InvalidVariableDeclarationException(String message, Exception cause) {
         super(message, cause);

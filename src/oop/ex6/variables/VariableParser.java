@@ -38,10 +38,10 @@ public class VariableParser {
      * @param type The variable type.
      * @param isFinal Whether it should be final.
      * @return A variable object.
-     * @throws LogicException.UnrecognizedVariableTypeException When the type name is unrecognized.
+     * @throws UnrecognizedVariableTypeException When the type name is unrecognized.
      */
     public static Variable createVariable(String varName, String type, boolean isFinal)
-            throws LogicException.UnrecognizedVariableTypeException {
+            throws UnrecognizedVariableTypeException {
         switch (type) {
             case "boolean":
                 return new BooleanVariable(varName, isFinal);
@@ -54,7 +54,7 @@ public class VariableParser {
             case "String":
                 return new StringVariable(varName, isFinal);
             default:
-                throw new LogicException.UnrecognizedVariableTypeException(type);
+                throw new UnrecognizedVariableTypeException(type);
         }
     }
 

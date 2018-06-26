@@ -1,18 +1,135 @@
 tomerg
-am_204713721
+guygreen873
 
 
 =============================
 =      File description     =
 =============================
+Packages:
+
+oop.ex6.main - Deals with the top-level processes of parsing the SJava code. Namely, parsing a file into a line tree,
+parsing the line tree into a GlobalScope object, and verifying it and its inner scopes recursively.
+
+oop.ex6.scopes - Deals with Scope classes that represent blocks of code, as well as the exceptions they throw.
+More on this in the Design section.
+
+oop.ex6.variables - Deals with verification of variable-related code lines in the purely syntactical sense. Implements
+the entire collection of syntax rules regarding declaration, assignment and usage of variables.
 
 
 =============================
 =          Design           =
 =============================
 
+*  Initial parsing of the code is done by creating a tree of lines, implemented by the LineTree class. All lines that
+are inside a certain block, whether it is a method or a condition block, are children of the header line. We felt that
+this is a natural way to process the code because it enables each Scope object to receive only the root node of a header
+line that it represents, and parse the entire block. It also enables the global scope to parse all the method and variable
+declarations (the root node's direct children) before any other code is parsed.
+
+*  Each block of code (enclosed in {}) is implemented by a Scope object. This lets us naturally implements the symbol
+tables (HashMaps that hold variable names and objects) of each scope, as well as scope hierarchy.  To verify a variable
+declaration, all we need is to look into the scope's own symbol table and check if the symbol exists. Verifying a
+variable usage is done by recursively looking for the variable in the scope itself as well as all its parent scopes.
+This also enables us to implement searching for a variable differently for each scope. For example, a method scope
+holds all the global variables in its own symbol table, and therefore doesn't need to call its parent scope when searching
+for a variable. Finally, the realization that methods and the global code lines are in fact types of scopes was very helpful.
+It enabled us to use the property of having a variable symbol table, which applies to all scope, and yet extend the scope
+class with other necessary data members, such a method table for the global scope and a parameter list for a method scope.
+
+*  Syntax verification in relation to variables is performed in a separate package called "variables". Each type of
+variable is represented by a class, which has a method to verify the syntax of primitive values assigned to it. Additionally,
+this enables us to implement a hierarchy between variables. For example, an int variable can be assigned to a boolean
+variable, hence IntVariable inherits from BooleanVariable, and verifying this type of assignment is done using isInstance().
+Additionally, following the Single Choice principle, all syntax verification regarding variables is done by the
+VariableParser class in that package. Regex verifying declarations and assignments in that class are composed of smaller
+Regex that verify variable names, individual assignments and legal delimitation of variables in a parameter list or
+declaration. All it takes to update the SJava syntax is modification of these regex and their accompanying methods.
+
 
 =============================
 =  Implementation details   =
 =============================
+
+*  Searching for a declared variable is done recursively. When a variable is searched in a scope, it first looks in its
+own symbol table, and then calls the search function of its parent scope. This enables us to modify the way we search
+for variables in each type of scope. For example, if we want a method scope to search its parameter list instead of its
+symbol table.
+
+*  Throughout the code we use the following useful distinction for the purposes of declaration, assignment and usage of
+variables: a given variable name can have any of the following properties. It can be:
+- Declarable - meaning it is not already in the symbol table of the scope it is declared in.
+- Assignable - meaning it was already declared in one of the scopes encapsulating the scope it is assigned in, or in the
+scope itself.
+- Usable - meaning it is assignable and initialized (meaning, initially assigned a value or is a method parameter).
+This distinction simplified much of the code, since checking whether a variable name has any of these properties is done
+by calling the corresponding method for the scope when it is declared, assigned, or used.
+
+*  When parsing an assignment statement, we need to parse the data regarding the target variable name and the assigned
+value or variable name to a scope object, in order to check that the variable name is assignable, and that the assigned
+variable is usable or the assigned primitive value is legal. This is done by creating a VariableAssignment object that
+is returned by the VariableParser method parsing the assignment. This is instead of returning a less self-explaining object
+such as a size two array.
+
+
+=============================
+=   Answers to Questions    =
+=============================
+
+6.1) We used exceptions to propagate validation errors up to the main function. We have two main classes of errors -
+Syntax, dealing with purely malformed expressions, and logical, dealing with the logical guidelines of SJava. We created
+several specific exception classes to express different kind of exceptions and represent their hierarchy. For example,
+an InvalidParameterList exception is a type of variable declaration exception, and so it inherits from VariableDeclarationException
+class. This enables flexibility with handling different categories of exceptions differently and allows for maximum
+modularity. Exceptions caught in specific verification processes are thrown up the calling chain and are treated according
+to the exception type. For example, an UnknownVariableException might be used by the verifyAssignment function to distinguish
+between assigning a variable and a primitive value. We therefore decided that having many different exceptions is crucial
+to possible future modularity of the project.
+
+
+6.2) Please see the Design and Implementation sections for details on how we applied OO principles in our designs -
+scope hierarchy and composition (each scope holds a parent scope, a header line node, and a symbol table), delegation
+(the parent scope calls its own variable search method when needed), and single choice (syntax validation is performed
+in a single class).
+
+
+6.3) Firstly, when we parsed each code line we deleted all space characters between non-space characters and left one
+space instead. We also trimmed the entire line. This simplified many regex going forward.
+
+Instead of two regex will now delineate a regex that matches an entire variable declaration line, that might include
+multiple variables and several assignments. The regex is composed of smaller regex which we will introduce from smaller
+to bigger.
+
+FINAL_VARIABLE_DECLARATION_PREFIX = "(?:(final) )?";  - Captures the word "final" and matches it with or without a space.
+
+VARIABLE_TYPES_REGEX = "((?:int)|(?:boolean)|(?:String)|(?:double)|(?:char)) ";  - Captures the variable type followed
+by a space. Matches any of the known variable types but captures only one word.
+
+LEGAL_VAR_NAME_REGEX = "(_*[a-zA-Z]\\w*)";  - Matches and captures a variable name according to the instructions: possibly
+starts with any number of underscores, followed by a character (not a digit), followed by any sequence of numbers and digits.
+
+ASSIGNMENT_WITHOUT_VAR_NAME = " ?(=) ?(.*?)";  - Matches an equal sign followed by ANY EXPRESSION, but reluctantly. Keep
+in mind this is all encapsulated in parentheses, so it may not exist in an individual declaration. In order to parse a
+declaration, we need to see if it includes initiation (captures = and not null) and then the expression it assigns, parsed
+in a different manner.
+
+VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT = " ?" + LEGAL_VAR_NAME_REGEX + "(?:"
+                                     + ASSIGNMENT_WITHOUT_VAR_NAME + ")? ?";  - Captures a valid variable name followed
+possibly by an equal sign and ANY expression.
+
+Finally:
+
+VARIABLE_DECLARATION_REGEX = FINAL_VARIABLE_DECLARATION_PREFIX +
+            VARIABLE_TYPES_REGEX + "((?:" + VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT + ",)*"
+            + VAR_DEC_WITH_OR_WITHOUT_ASSIGNMENT + ");";
+Matches a possible final declaration, followed by a variable type (captured), followed by individual variable declaration
+which are captured in its entirety, and then passed to other methods that check their validity, individually. The list
+of individual declarations is composed by possibly any number of declarations followed by a comma, and then one variable
+declaration without a comma.
+
+
+
+
+
+
 

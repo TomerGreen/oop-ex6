@@ -14,6 +14,11 @@ public class ConditionScope extends Scope {
         verifyScope();
     }
 
+    /**
+     * vwrify the boolean condition of the condition
+     * @param conditionLine all the condition line
+     * @throws LogicException when logic problem appears
+     */
     private void booleanConditionVerifier(String conditionLine) throws LogicException{
         Variable dummy = VariableParser.createVariable("dummy", "boolean", false );
         String[] conditions = conditionLine.split(AND_OR_REGEX);

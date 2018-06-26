@@ -1,6 +1,7 @@
 package oop.ex6.scopes;
 
 import oop.ex6.main.*;
+import oop.ex6.variables.UnrecognizedVariableTypeException;
 import oop.ex6.variables.Variable;
 import oop.ex6.variables.VariableParser;
 
@@ -18,6 +19,9 @@ class MethodScope extends Scope {
     private static final String ILLEGAL_METHOD_NAME = "method name already used";
     private static final int NAME_PLC = 1;
     private static final int ARGS_PLC = 2;
+    private static final String EMPTY_STRING1 = "";
+    private static final String EMPTY_STRING2 = " ";
+    private Pattern methodDecelerationPattern = Pattern.compile(METHOD_DECELERATION_REGEX);
 
     private ArrayList<Variable> parameterList;
 
@@ -27,8 +31,13 @@ class MethodScope extends Scope {
         DecAnalyzer(root.getData());
     }
 
+    /**
+     * A method which verify and analyze the method's declaration
+     * @param deceleration the declaration of the method
+     * @throws SyntaxException when there's syntax problem with the Sjava code
+     * @throws LogicException when there's logic problem with the Sjava code
+     */
     private void DecAnalyzer(String deceleration) throws  SyntaxException, LogicException{
-        Pattern methodDecelerationPattern = Pattern.compile(METHOD_DECELERATION_REGEX);
         Matcher methodDecelerationMatcher = methodDecelerationPattern.matcher(deceleration);
         if(!methodDecelerationMatcher.find())
             throw new SyntaxException.ExceptionFileFormat( ILLEGAL_METHOD_DECELERATION);
@@ -46,7 +55,7 @@ class MethodScope extends Scope {
      * @param parameterList The content of the method declaration parentheses.
      * @return A linked list of parameter variables.
      * @throws SyntaxException When the parameter list syntax is wrong.
-     * @throws LogicException.InvalidParameterListException When the parameter list is invalid.
+     * @throws LogicException When the parameter list is invalid.
      */
     private ArrayList<Variable> getParameterList(String parameterList) throws SyntaxException,
             LogicException{
@@ -67,7 +76,7 @@ class MethodScope extends Scope {
                     currParam = VariableParser.createVariable(paramName, type, isFinal);
                 }
                 else {
-                    throw new LogicException.InvalidParameterListException("Parameter name "
+                    throw new InvalidParameterListException("Parameter name "
                             + paramName + " is already declared.");
                 }
                 currParam.initialize();  // A parameter variable is always initialized (assignable in method scope).
@@ -75,15 +84,21 @@ class MethodScope extends Scope {
                 parameters.add(currParam);
             }
         }
-        catch (LogicException.UnrecognizedVariableTypeException e) {
-            throw new LogicException.InvalidParameterListException(e.getMessage(), e);
+        catch (UnrecognizedVariableTypeException e) {
+            throw new InvalidParameterListException(e.getMessage(), e);
         }
         return parameters;
     }
 
+    /**
+     *
+     * @param callingScope
+     * @param parametersLine
+     * @throws LogicException
+     */
     void methodCallVerify(Scope callingScope, String parametersLine) throws LogicException{
         String[] parameters;
-        if(parametersLine.matches(" ?"))
+        if(parametersLine.equals(EMPTY_STRING1) | parametersLine.equals(EMPTY_STRING2))
             parameters = new String[0];
         else
             parameters = parametersLine.split(COMMA);

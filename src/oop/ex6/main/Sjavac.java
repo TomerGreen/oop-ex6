@@ -24,7 +24,7 @@ public class Sjavac {
             BufferedReader br = new BufferedReader(new FileReader(SjavaFile));
             //here we parse the text sjava file to tree of nested scopes
             LineTree parsedFile = new LineTree(br);
-            //here we analyze all the relevant data in the main1 class scope (A.K.A global)
+            //here we analyze all the relevant data in the main class scope (A.K.A global)
             GlobalScope gllobalTable = new GlobalScope(parsedFile);
 
 
